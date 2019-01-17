@@ -1,0 +1,13 @@
+py-solc
+web3
+eth-utils
+click
+
+# --- development dependencies, i.e. dependencies not needed for running ethindex
+flake8
+mypy
+pytest
+setuptools_scm
+# require a recent pip version, otherwise make install may silently fail to
+# install the newly compiled contracts
+pip>=18.1

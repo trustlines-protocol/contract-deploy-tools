@@ -8,5 +8,11 @@ setup(
     install_requires=[
         'py-solc',
         'web3',
-    ]
+        'eth-utils',
+        'click'
+    ],
+    entry_points="""
+    [console_scripts]
+    deploy-tools=deploy_tools.cli:main
+    """,
 )

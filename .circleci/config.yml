@@ -4,6 +4,8 @@ executors:
   ubuntu-builder:
     docker:
       - image: trustlines/builder:master8
+        environment:
+          - SOLC_VERSION=v0.4.25
     working_directory: ~/repo
 
 templates:
@@ -32,6 +34,66 @@ commands:
           echo >> ${BASH_ENV} 'export PATH=~/bin:~/repo/venv/bin:${PATH}'
 
 jobs:
+  install:
+    executor: ubuntu-builder
+    steps:
+      - checkout
+      - config-path
+      - restore_cache:
+          key: venv-{{ checksum "constraints.txt" }}-{{ checksum "requirements.txt" }}
+      - create-venv
+      - run:
+          name: Install requirements
+          command: |
+            pip install -c constraints.txt -r requirements.txt
+      - save_cache:
+          key: venv-{{ checksum "constraints.txt" }}-{{ checksum "requirements.txt" }}
+          paths:
+            - venv
+      - run:
+          name: Install package
+          command: |
+            pip install -c constraints.txt -e .
+      - persist_to_workspace:
+          root: "~"
+          paths:
+            - repo
+
+  run-flake8:
+    executor: ubuntu-builder
+
+    steps:
+      - attach_workspace:
+          at: '~'
+      - config-path
+      - run:
+          name: Run flake8
+          command: |
+            flake8 deploy_tools tests
+
+  run-pytest:
+    executor: ubuntu-builder
+    steps:
+      - attach_workspace:
+          at: '~'
+      - config-path
+      - run:
+          name: Run pytest
+          command: |
+            pytest tests
+
+  run-mypy:
+    executor: ubuntu-builder
+    steps:
+      - attach_workspace:
+          at: '~'
+      - config-path
+      - run:
+          name: Run mypy
+          command: |
+            mypy --ignore-missing-imports deploy_tools tests
+
+
   build-sdist:
     executor: ubuntu-builder
     steps:
@@ -68,6 +130,21 @@ workflows:
   version: 2
   default:
     jobs:
+      - run-flake8:
+          requires:
+            - install
+          filters:
+            <<: *tagged-filter
+
+      - install:
+          filters:
+            <<: *tagged-filter
+
+      - run-pytest:
+          filters:
+            <<: *tagged-filter
+          requires:
+            - install
       - build-sdist:
           filters:
             <<: *tagged-filter

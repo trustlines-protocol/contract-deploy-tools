@@ -1,31 +1,15 @@
-import os
-from solc import compile_files
 from web3 import Web3
 from web3.utils.threads import (
     Timeout,
 )
 
 
-def compile_contracts(contract_name):
-    """compiles a contract situated in blockchain/contracts/contracts with file name contract_name.sol
-    returns the abi and bytecode"""
-    path_to_contract_source_code = (os.path.join(os.path.dirname(__file__),
-                                                 os.pardir,
-                                                 "contracts",
-                                                 contract_name + ".sol"))
-
-    compiled_sol = compile_files([path_to_contract_source_code])
-    contract_interface = compiled_sol[path_to_contract_source_code + ":" + contract_name]
-
-    return contract_interface
-
-
 def deploy_compiled_contract(contract_interface, web3, *args):
-    contract = web3.eth.contract(abi=contract_interface['abi'], bytecode=contract_interface['bin'])
+    contract = web3.eth.contract(abi=contract_interface['abi'], bytecode=contract_interface['bytecode'])
     txhash = contract.constructor(*args).transact()
     receipt = check_successful_tx(web3, txhash)
-    id_address = receipt["contractAddress"]
-    return contract(id_address)
+    address = receipt["contractAddress"]
+    return contract(address)
 
 
 class TransactionFailed(Exception):
