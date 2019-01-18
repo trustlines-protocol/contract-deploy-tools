@@ -136,6 +136,12 @@ workflows:
           filters:
             <<: *tagged-filter
 
+      - run-mypy:
+          requires:
+            - install
+          filters:
+            <<: *tagged-filter
+
       - install:
           filters:
             <<: *tagged-filter
@@ -152,6 +158,9 @@ workflows:
       - upload-pypi:
           requires:
             - build-sdist
+            - run-flake8
+            - run-pytest
+            - run-mypy
           filters:
             <<: *tagged-filter
             branches:

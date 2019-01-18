@@ -12,7 +12,8 @@ DEFAULT_OUTPUT_SELECTION = [
     'devdoc',
     'userdoc',
     'metadata',
-    'evm'
+    'evm.bytecode',
+    'evm.deployedBytecode'
 ]
 
 
