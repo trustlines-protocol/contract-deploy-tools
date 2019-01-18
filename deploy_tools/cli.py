@@ -17,8 +17,14 @@ def main():
     default='contracts',
     show_default=True,
     type=click.Path(file_okay=False, exists=True))
-def compile(source_dir):
-    compiled_contracts = compile_project(source_dir)
+@click.option(
+    '--optimize',
+    '-o',
+    default=False,
+    help='Turns on the solidity optimizer',
+    is_flag=True)
+def compile(source_dir, optimize):
+    compiled_contracts = compile_project(source_dir, optimize=optimize)
 
     ensure_path_exists('build')
     write_compiled_contracts(compiled_contracts, 'build/contracts.json')

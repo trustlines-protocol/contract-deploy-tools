@@ -12,7 +12,7 @@ DEFAULT_OUTPUT_SELECTION = [
     'devdoc',
     'userdoc',
     'metadata',
-    'evm.bytecode'
+    'evm'
 ]
 
 
@@ -79,15 +79,17 @@ def compile_project(
         *,
         file_paths: List[str] = None,
         allow_paths: List[str] = None,
-        pattern='*.sol'
+        pattern='*.sol',
+        optimize=False
 ):
     """
     Compiles all contracts of the project into a single output
     Args:
-        contracts_path: The path of the folder that includes the contracts
-        file_paths: Optional a list of to compiled contracts can be provided
+        contracts_path: The path of the folder that includes the contracts, defaults to 'contracts'
+        file_paths: A list of to compiled contracts can be provided (optional)
         allow_paths: Additional paths from where it is allowed to load contracts
         pattern: The pattern to find the solidity files
+        optimize: Weather to turn on the solidity optimizer
 
     Returns: A dictionary containing the compiled assets of the contracts
 
@@ -120,9 +122,15 @@ def compile_project(
         }
     }
 
+    if optimize:
+        std_input['settings']['optimizer'] = {
+            'enabled': True,
+            'runs': 500
+        }
+
     compilation_result = compile_standard(
         std_input,
-        allow_paths=','.join(os.path.abspath(path) for path in allow_paths)
+        allow_paths=','.join(os.path.abspath(path) for path in allow_paths),
     )
 
     if 'errors' in compilation_result:
@@ -136,7 +144,8 @@ def compile_contract(
         name: str,
         *,
         contracts_path='contracts',
-        file_extension='.sol'
+        file_extension='.sol',
+        optimize=False
 ):
     filename = name + file_extension
     file_paths = list(find_files(contracts_path, filename))
@@ -147,5 +156,5 @@ def compile_contract(
     if len(file_paths) > 1:
         raise ValueError('Multiple files found: {}'.format(file_paths))
 
-    compiled_contracts = compile_project(file_paths=file_paths, allow_paths=[contracts_path])
+    compiled_contracts = compile_project(file_paths=file_paths, allow_paths=[contracts_path], optimize=optimize)
     return compiled_contracts[name]
