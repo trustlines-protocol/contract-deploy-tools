@@ -14,5 +14,7 @@ setup(
     entry_points="""
     [console_scripts]
     deploy-tools=deploy_tools.cli:main
+    [pytest11]
+    deploy-tools=deploy_tools.plugin
     """,
 )

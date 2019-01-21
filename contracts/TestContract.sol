@@ -4,10 +4,10 @@ import './subfolder/OtherContract.sol';
 
 contract TestContract {
 
-    int public state = 5;
+    int public state;
 
-    constructor() public {
-        state = 1;
+    constructor(int val) public {
+        state = val;
     }
 
     function testFunction(int a) public view returns (int) {

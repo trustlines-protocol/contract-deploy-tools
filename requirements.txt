@@ -1,5 +1,6 @@
 py-solc
 web3
+eth-tester[py-evm]
 eth-utils
 click
 
