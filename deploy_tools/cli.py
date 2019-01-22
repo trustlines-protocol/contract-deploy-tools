@@ -11,9 +11,9 @@ def main():
 
 @main.command(short_help='Compile all contracts')
 @click.option(
-    '--source-dir',
+    '--contracts-dir',
     '-d',
-    help='Directory of the sources',
+    help='Directory of the contracts sources',
     default='contracts',
     show_default=True,
     type=click.Path(file_okay=False, exists=True))
@@ -23,8 +23,8 @@ def main():
     default=False,
     help='Turns on the solidity optimizer',
     is_flag=True)
-def compile(source_dir, optimize):
-    compiled_contracts = compile_project(source_dir, optimize=optimize)
+def compile(contracts_dir, optimize):
+    compiled_contracts = compile_project(contracts_dir, optimize=optimize)
 
     ensure_path_exists('build')
     write_compiled_contracts(compiled_contracts, 'build/contracts.json')

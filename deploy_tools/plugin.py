@@ -11,9 +11,28 @@ from web3.providers.eth_tester import EthereumTesterProvider
 from deploy_tools import compile_project, deploy_compiled_contract
 
 
+CONTRACTS_FOLDER_OPTION = "--contracts-dir"
+CONTRACTS_FOLDER_OPTION_HELP = "Folder which contains the project smart contracts"
+
+
+def pytest_addoption(parser):
+    parser.addoption(CONTRACTS_FOLDER_OPTION, help=CONTRACTS_FOLDER_OPTION_HELP)
+    parser.addini(CONTRACTS_FOLDER_OPTION, CONTRACTS_FOLDER_OPTION_HELP)
+
+
+def get_contracts_folder(pytestconfig):
+    if pytestconfig.getoption(CONTRACTS_FOLDER_OPTION, default=None):
+        return pytestconfig.getoption(CONTRACTS_FOLDER_OPTION)
+    return Path(pytestconfig.rootdir) / 'contracts'
+
+
 @pytest.fixture(scope='session')
 def contract_assets(pytestconfig):
-    contracts_path = Path(pytestconfig.rootdir) / 'contracts'
+    """
+    Returns the compilation assets (dict containing the content of `contracts.json`) of all compiled contracts
+    To change the directory of the contracts use the pytest option --contracts-dir
+    """
+    contracts_path = get_contracts_folder(pytestconfig)
     return compile_project(contracts_path=contracts_path, optimize=True)
 
 
@@ -37,26 +56,39 @@ def deploy_contract(web3, contract_assets):
 
 @pytest.fixture(scope='session')
 def chain():
+    """
+    The running ethereum tester chain
+    """
     return eth_tester.EthereumTester(eth_tester.PyEVMBackend())
 
 
 @pytest.fixture(scope='session')
 def web3(chain):
+    """
+    Web3 object connected to the ethereum tester chain
+    """
     return Web3(EthereumTesterProvider(chain))
 
 
 @pytest.fixture(scope='session', autouse=True)
 def set_default_account(web3):
+    """Sets the web3 default account to the first account of `accounts`"""
     web3.eth.defaultAccount = web3.eth.accounts[0]
 
 
 @pytest.fixture(scope='session')
 def accounts(web3):
+    """
+    Some ethereum accounts on the test chain with some ETH
+    """
     return web3.eth.accounts
 
 
 @pytest.fixture(scope='session')
 def account_keys(chain):
+    """
+    The private keys that correspond to the accounts of the `accounts` fixture
+    """
     return chain.backend.account_keys
 
 
