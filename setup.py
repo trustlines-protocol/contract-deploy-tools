@@ -9,7 +9,8 @@ setup(
         'py-solc',
         'web3',
         'eth-utils',
-        'click'
+        'click',
+        'eth-tester[pyevm]',
     ],
     entry_points="""
     [console_scripts]
