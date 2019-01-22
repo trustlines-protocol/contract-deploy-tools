@@ -77,6 +77,12 @@ def set_default_account(web3):
 
 
 @pytest.fixture(scope='session')
+def default_account(web3):
+    """Returns the default account which is used to deploy contracts"""
+    return web3.eth.defaultAccount
+
+
+@pytest.fixture(scope='session')
 def accounts(web3):
     """
     Some ethereum accounts on the test chain with some ETH
