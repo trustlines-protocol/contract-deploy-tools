@@ -1,6 +1,9 @@
 """Pytest plugins"""
 from pathlib import Path
 
+import io
+import shutil
+import subprocess
 import pytest
 import eth_tester
 from web3.contract import Contract
@@ -104,3 +107,40 @@ def chain_cleanup(chain):
     snapshot = chain.take_snapshot()
     yield
     chain.revert_to_snapshot(snapshot)
+
+
+def _find_solc(msgs):
+    solc = shutil.which("solc")
+    if solc:
+        msgs.write("solc: {}\n".format(solc))
+    else:
+        msgs.write("solc: <NOT FOUND>\n")
+    return solc
+
+
+def _get_solc_version(msgs):
+    try:
+        process = subprocess.Popen(['solc', '--version'], stdout=subprocess.PIPE)
+    except Exception as err:
+        msgs.write("solidity version: <ERROR {}>".format(err))
+        return
+
+    out, _ = process.communicate()
+
+    lines = out.decode('utf-8').splitlines()
+    for line in lines:
+        if line.startswith("Version: "):
+            msgs.write("solidity version: {}\n".format(line[len("Version: "):]))
+            break
+    else:
+        msgs.write("solidity version: <UNKNOWN>")
+
+
+def pytest_report_header(config):
+    msgs = io.StringIO()
+    solc = _find_solc(msgs)
+
+    if solc:
+        _get_solc_version(msgs)
+
+    return msgs.getvalue()
