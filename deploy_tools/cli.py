@@ -5,7 +5,7 @@ import click
 from deploy_tools.compile import filter_contracts, UnknownContractException
 from deploy_tools.files import (
     write_pretty_json_asset,
-    ensure_path_exists,
+    ensure_path_for_file_exists,
     write_minified_json_asset,
 )
 from web3 import Web3, EthereumTesterProvider, Account
@@ -100,9 +100,19 @@ def main():
     default=None,
     help="Comma separated list of contract names to include in the output, default is to include all contracts",
 )
-def compile(contracts_dir, optimize, only_abi, minimize, contract_names):
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(dir_okay=False, writable=True, exists=False),
+    help="Name of the output file",
+    show_default=True,
+    default="build/contracts.json",
+)
+def compile(contracts_dir, optimize, only_abi, minimize, contract_names, output):
     if contract_names is not None:
         contract_names = contract_names.split(",")
+
+    ensure_path_for_file_exists(output)
 
     try:
         compiled_contracts = filter_contracts(
@@ -113,12 +123,10 @@ def compile(contracts_dir, optimize, only_abi, minimize, contract_names):
         raise click.BadOptionUsage(
             "contract-names", f"Could not find contract: {e.args[0]}"
         )
-
-    ensure_path_exists("build")
     if minimize:
-        write_minified_json_asset(compiled_contracts, "build/contracts.json")
+        write_minified_json_asset(compiled_contracts, output)
     else:
-        write_pretty_json_asset(compiled_contracts, "build/contracts.json")
+        write_pretty_json_asset(compiled_contracts, output)
 
 
 @main.command(short_help="Deploys a contract")

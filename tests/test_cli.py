@@ -29,6 +29,11 @@ def keystores(tmp_path, account_keys, key_password):
 
 
 @pytest.fixture()
+def output_file(tmp_path):
+    return tmp_path / "test.json"
+
+
+@pytest.fixture()
 def keystore_file_path(tmp_path, keystores, key_password):
     """path to keystore of account[1]"""
     return keystores[1]
@@ -58,19 +63,42 @@ def test_default_compile(runner):
     result = runner.invoke(main, "compile -d testcontracts")
     assert result.exit_code == 0
 
+    with open("build/contracts.json") as f:
+        contract_assets = json.load(f)
+        assert "TestContract" in contract_assets
+
 
 @pytest.mark.usefixtures("go_to_root_dir")
 def test_minimize_compile(runner):
     result = runner.invoke(main, "compile -d testcontracts --minimize")
     assert result.exit_code == 0
 
+    with open("build/contracts.json") as f:
+        contract_assets = json.load(f)
+        assert "TestContract" in contract_assets
+
 
 @pytest.mark.usefixtures("go_to_root_dir")
 def test_contract_names_compile(runner):
     result = runner.invoke(
-        main, "compile -d testcontracts --contract-names TestContract"
+        main, "compile -d testcontracts --contract-names OtherContract"
     )
     assert result.exit_code == 0
+
+    with open("build/contracts.json") as f:
+        contract_assets = json.load(f)
+        assert "TestContract" not in contract_assets
+        assert "OtherContract" in contract_assets
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_contract_output_file(runner, output_file):
+    result = runner.invoke(main, f"compile -d testcontracts -o {output_file}")
+    assert result.exit_code == 0
+
+    with output_file.open() as f:
+        contract_assets = json.load(f)
+        assert "TestContract" in contract_assets
 
 
 @pytest.mark.usefixtures("go_to_root_dir")

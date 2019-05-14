@@ -1,6 +1,7 @@
 import os
 import fnmatch
 import json
+from pathlib import Path
 from typing import Dict
 
 
@@ -11,9 +12,8 @@ def find_files(dir: str, pattern: str):
                 yield os.path.join(dirpath, filename)
 
 
-def ensure_path_exists(dir_path):
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
+def ensure_path_for_file_exists(file_path):
+    Path(file_path).parent.mkdir(parents=True, exist_ok=True)
 
 
 def write_pretty_json_asset(json_data: Dict, asset_path: str):
