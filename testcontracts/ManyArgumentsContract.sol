@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.8;
 
 contract ManyArgumentsContract {
 
@@ -9,7 +9,7 @@ contract ManyArgumentsContract {
     address public e;
     bytes public f;
 
-    constructor(uint _a, int _b, int32 _c, bool _d, address _e, bytes _f) public {
+    constructor(uint _a, int _b, int32 _c, bool _d, address _e, bytes memory _f) public {
         a = _a;
         b = _b;
         c = _c;
