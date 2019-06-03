@@ -108,7 +108,18 @@ def main():
     show_default=True,
     default="build/contracts.json",
 )
-def compile(contracts_dir, optimize, only_abi, minimize, contract_names, output):
+@click.option(
+    "--evm-version",
+    "-evm",
+    type=str,
+    help="The evm target version, one of: "
+    "petersburg, constantinople, byzantium, spuriousDragon, tangerineWhistle, or homestead",
+    show_default=True,
+    default="byzantium",
+)
+def compile(
+    contracts_dir, optimize, only_abi, minimize, contract_names, output, evm_version
+):
     if contract_names is not None:
         contract_names = contract_names.split(",")
 
@@ -117,7 +128,12 @@ def compile(contracts_dir, optimize, only_abi, minimize, contract_names, output)
     try:
         compiled_contracts = filter_contracts(
             contract_names,
-            compile_project(contracts_dir, optimize=optimize, only_abi=only_abi),
+            compile_project(
+                contracts_dir,
+                optimize=optimize,
+                only_abi=only_abi,
+                evm_version=evm_version,
+            ),
         )
     except UnknownContractException as e:
         raise click.BadOptionUsage(
