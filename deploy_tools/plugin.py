@@ -16,11 +16,18 @@ from deploy_tools import compile_project, deploy_compiled_contract
 
 CONTRACTS_FOLDER_OPTION = "--contracts-dir"
 CONTRACTS_FOLDER_OPTION_HELP = "Folder which contains the project smart contracts"
+EVM_VERSION_OPTION = "--evm-version"
+EVM_VERSION_OPTION_HELP = (
+    "The evm target version one of: "
+    "petersburg, constantinople, byzantium, spuriousDragon, tangerineWhistle, or homestead"
+)
 
 
 def pytest_addoption(parser):
     parser.addoption(CONTRACTS_FOLDER_OPTION, help=CONTRACTS_FOLDER_OPTION_HELP)
     parser.addini(CONTRACTS_FOLDER_OPTION, CONTRACTS_FOLDER_OPTION_HELP)
+    parser.addoption(EVM_VERSION_OPTION, help=EVM_VERSION_OPTION_HELP)
+    parser.addini(EVM_VERSION_OPTION, EVM_VERSION_OPTION_HELP)
 
 
 def get_contracts_folder(pytestconfig):
@@ -29,14 +36,24 @@ def get_contracts_folder(pytestconfig):
     return Path(pytestconfig.rootdir) / "contracts"
 
 
+def get_evm_version(pytestconfig):
+    if pytestconfig.getoption(EVM_VERSION_OPTION, default=None):
+        return pytestconfig.getoption(EVM_VERSION_OPTION)
+    return "byzantium"
+
+
 @pytest.fixture(scope="session")
 def contract_assets(pytestconfig):
     """
     Returns the compilation assets (dict containing the content of `contracts.json`) of all compiled contracts
-    To change the directory of the contracts use the pytest option --contracts-dir
+    To change the directory of the contracts, use the pytest option --contracts-dir
+    To change the target evm version, use the pytest option --evm-version
     """
     contracts_path = get_contracts_folder(pytestconfig)
-    return compile_project(contracts_path=contracts_path, optimize=True)
+    evm_version = get_evm_version(pytestconfig)
+    return compile_project(
+        contracts_path=contracts_path, optimize=True, evm_version=evm_version
+    )
 
 
 @pytest.fixture(scope="session")
