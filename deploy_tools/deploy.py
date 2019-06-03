@@ -17,7 +17,7 @@ def deploy_compiled_contract(
     web3: Web3,
     constructor_args=(),
     transaction_options: Dict = None,
-    private_key=None,
+    private_key=None
 ) -> Contract:
     """
     Deploys a compiled contract either using an account of the node, or a local private key

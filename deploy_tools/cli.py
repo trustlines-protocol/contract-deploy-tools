@@ -73,6 +73,15 @@ optimize_option = click.option(
     help="Turns on the solidity optimizer",
     is_flag=True,
 )
+evm_version_option = click.option(
+    "--evm-version",
+    "-evm",
+    type=str,
+    help="The evm target version, one of: "
+    "petersburg, constantinople, byzantium, spuriousDragon, tangerineWhistle, or homestead",
+    show_default=True,
+    default="byzantium",
+)
 
 
 @click.group()
@@ -83,6 +92,7 @@ def main():
 @main.command(short_help="Compile all contracts")
 @contracts_dir_option
 @optimize_option
+@evm_version_option
 @click.option(
     "--only-abi",
     default=False,
@@ -108,17 +118,8 @@ def main():
     show_default=True,
     default="build/contracts.json",
 )
-@click.option(
-    "--evm-version",
-    "-evm",
-    type=str,
-    help="The evm target version, one of: "
-    "petersburg, constantinople, byzantium, spuriousDragon, tangerineWhistle, or homestead",
-    show_default=True,
-    default="byzantium",
-)
 def compile(
-    contracts_dir, optimize, only_abi, minimize, contract_names, output, evm_version
+    contracts_dir, optimize, evm_version, only_abi, minimize, contract_names, output
 ):
     if contract_names is not None:
         contract_names = contract_names.split(",")
@@ -156,6 +157,7 @@ def compile(
 @jsonrpc_option
 @contracts_dir_option
 @optimize_option
+@evm_version_option
 def deploy(
     contract_name: str,
     args: Sequence[str],
@@ -167,6 +169,7 @@ def deploy(
     jsonrpc: str,
     contracts_dir,
     optimize,
+    evm_version,
 ):
     """
     Deploys a contract
@@ -184,7 +187,9 @@ def deploy(
         gas=gas, gas_price=gas_price, nonce=nonce
     )
 
-    compiled_contracts = compile_project(contracts_dir, optimize=optimize)
+    compiled_contracts = compile_project(
+        contracts_dir, optimize=optimize, evm_version=evm_version
+    )
 
     if contract_name not in compiled_contracts:
         raise click.BadArgumentUsage(f"Contract {contract_name} was not found.")
