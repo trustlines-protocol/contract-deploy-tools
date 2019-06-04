@@ -75,7 +75,6 @@ optimize_option = click.option(
 )
 evm_version_option = click.option(
     "--evm-version",
-    "-evm",
     type=str,
     help="The evm target version, one of: "
     "petersburg, constantinople, byzantium, spuriousDragon, tangerineWhistle, or homestead",
