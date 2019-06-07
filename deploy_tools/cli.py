@@ -1,22 +1,22 @@
 from typing import Sequence
 
 import click
-
-from deploy_tools.compile import filter_contracts, UnknownContractException
-from deploy_tools.files import (
-    write_pretty_json_asset,
-    ensure_path_for_file_exists,
-    write_minified_json_asset,
-)
 from web3 import Web3, EthereumTesterProvider, Account
 from web3._utils.abi import get_constructor_abi, get_abi_input_types
 
-from deploy_tools.deploy import (
+from .files import (
+    write_pretty_json_asset,
+    ensure_path_for_file_exists,
+    write_minified_json_asset,
+    validate_and_format_address,
+    InvalidAddressException,
+)
+from .deploy import (
     decrypt_private_key,
     build_transaction_options,
     deploy_compiled_contract,
 )
-from .compile import compile_project
+from .compile import filter_contracts, UnknownContractException, compile_project
 
 
 # we need test_provider and test_json_rpc for running the tests in test_cli
@@ -281,3 +281,12 @@ def parse_arg_to_matching_type(arg, type: str):
     ):
         return arg
     raise ValueError(f"Cannot handle parameter of type {type} yet.")
+
+
+def validate_address(ctx, param, value):
+    try:
+        return validate_and_format_address(value)
+    except InvalidAddressException as e:
+        raise click.BadParameter(
+            f"The address parameter is not recognized to be an address: {value}"
+        ) from e
