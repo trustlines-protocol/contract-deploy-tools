@@ -1,6 +1,11 @@
 ==========
 Change Log
 ==========
+
+`0.4.1`_ (2019-06-21)
+-------------------------------
+* Add function to validate addresses as a callback for click
+
 `0.4.0`_ (2019-06-05)
 -------------------------------
 * The minimum required web3 version is now 5.0.0b2
@@ -43,3 +48,4 @@ Change Log
 .. _0.2.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.2.0...0.2.1
 .. _0.3.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.2.1...0.3.0
 .. _0.4.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.3.0...0.4.0
+.. _0.4.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.4.0...0.4.1
