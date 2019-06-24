@@ -237,8 +237,6 @@ def deploy(
 @keystore_option
 @jsonrpc_option
 @contracts_dir_option
-@optimize_option
-@evm_version_option
 @contract_address_option
 def send_transaction_to_contract(
     contract_name: str,
@@ -252,8 +250,6 @@ def send_transaction_to_contract(
     jsonrpc: str,
     contracts_dir,
     contract_address,
-    optimize,
-    evm_version,
 ):
     web3 = connect_to_json_rpc(jsonrpc)
     private_key = retrieve_private_key(keystore)
@@ -265,9 +261,7 @@ def send_transaction_to_contract(
         gas=gas, gas_price=gas_price, nonce=nonce
     )
 
-    compiled_contracts = compile_project(
-        contracts_dir, optimize=optimize, evm_version=evm_version
-    )
+    compiled_contracts = compile_project(contracts_dir)
 
     if contract_name not in compiled_contracts:
         raise click.BadArgumentUsage(f"Contract {contract_name} was not found.")
