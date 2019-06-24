@@ -18,4 +18,20 @@ contract TestContract {
         return a + state;
     }
 
+    function duplicatedDifferentArgumentLength(uint a) public {
+        state = a;
+    }
+
+    function duplicatedDifferentArgumentLength(uint a, uint b) public {
+        state = a + b;
+    }
+
+    function duplicatedSameArgumentLength(uint a) public pure returns (uint) {
+        return a;
+    }
+
+    function duplicatedSameArgumentLength(bytes memory a) public pure returns (bytes memory) {
+        return a;
+    }
+
 }

@@ -5,7 +5,8 @@ import json
 import pytest
 from click.testing import CliRunner
 from eth_keyfile import create_keyfile_json
-from eth_utils import is_address
+from eth_utils import is_address, is_hex, is_0x_prefixed
+from eth_utils.exceptions import ValidationError
 
 from deploy_tools.cli import main
 
@@ -26,6 +27,22 @@ def keystores(tmp_path, account_keys, key_password):
         paths.append(file_path)
 
     return paths
+
+
+@pytest.fixture()
+def test_contract_name():
+    return "TestContract"
+
+
+@pytest.fixture()
+def test_contract_address(runner, test_contract_name):
+    result = runner.invoke(
+        main, f"deploy {test_contract_name} -d testcontracts --jsonrpc test 4"
+    )
+    assert result.exit_code == 0
+    contract_address = result.output[:-1]
+    assert is_address(contract_address)
+    return contract_address
 
 
 @pytest.fixture()
@@ -176,3 +193,104 @@ def test_keystore_wrong_nonce(runner, keystore_file_path, key_password):
         input=key_password,
     )
     assert result.exit_code == 1
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_send_transaction_to_contract(
+    runner, test_contract_address, test_contract_name
+):
+    result = runner.invoke(
+        main,
+        (
+            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"-- {test_contract_name} set 1"
+        ),
+    )
+
+    assert result.exit_code == 0
+
+    transaction_hash = result.output.splitlines()[-1]
+
+    assert is_hex(transaction_hash)
+    assert is_0x_prefixed(transaction_hash)
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_send_transaction_to_contract_find_duplicated_function_by_argument_length(
+    runner, test_contract_address, test_contract_name
+):
+    result = runner.invoke(
+        main,
+        (
+            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"-- {test_contract_name} duplicatedDifferentArgumentLength 1"
+        ),
+    )
+
+    assert result.exit_code == 0
+
+    transaction_hash = result.output.splitlines()[-1]
+
+    assert is_hex(transaction_hash)
+    assert is_0x_prefixed(transaction_hash)
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_send_transaction_to_contract_can_not_find_duplicated_function_same_argument_length(
+    runner, test_contract_address, test_contract_name
+):
+    result = runner.invoke(
+        main,
+        (
+            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"-- {test_contract_name} duplicatedSameArgumentLength 1"
+        ),
+    )
+
+    assert result.exit_code == 1
+    assert type(result.exception) == ValueError
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_send_transaction_to_contract_non_existing_function(
+    runner, test_contract_address, test_contract_name
+):
+    result = runner.invoke(
+        main,
+        (
+            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"-- {test_contract_name} unknown 1"
+        ),
+    )
+
+    assert result.exit_code == 1
+    assert type(result.exception) == ValueError
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_send_transaction_to_contract_wrong_address_format(runner, test_contract_name):
+    result = runner.invoke(
+        main,
+        (
+            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address "
+            f"0x25D4760c08b4bf8e99c3658 -- {test_contract_name} set 1"
+        ),
+    )
+
+    assert result.exit_code == 2
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_send_transaction_to_contract_insufficient_gas(
+    runner, test_contract_address, test_contract_name
+):
+    result = runner.invoke(
+        main,
+        (
+            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"--gas 1 -- {test_contract_name} set 1"
+        ),
+    )
+
+    assert result.exit_code == 1
+    assert type(result.exception) == ValidationError

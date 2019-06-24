@@ -3,6 +3,7 @@ from typing import Sequence
 import click
 from web3 import Web3, EthereumTesterProvider, Account
 from web3._utils.abi import get_constructor_abi, get_abi_input_types
+from eth_utils import encode_hex
 
 from .files import (
     write_pretty_json_asset,
@@ -15,6 +16,7 @@ from .deploy import (
     decrypt_private_key,
     build_transaction_options,
     deploy_compiled_contract,
+    send_function_call_transaction,
 )
 from .compile import filter_contracts, UnknownContractException, compile_project
 
@@ -24,6 +26,15 @@ from .compile import filter_contracts, UnknownContractException, compile_project
 # therefore initialized on the module level.
 test_provider = EthereumTesterProvider()
 test_json_rpc = Web3(test_provider)
+
+
+def validate_address(ctx, param, value):
+    try:
+        return validate_and_format_address(value)
+    except InvalidAddressException as e:
+        raise click.BadParameter(
+            f"The address parameter is not recognized to be an address: {value}"
+        ) from e
 
 
 jsonrpc_option = click.option(
@@ -80,6 +91,13 @@ evm_version_option = click.option(
     "petersburg, constantinople, byzantium, spuriousDragon, tangerineWhistle, or homestead",
     show_default=True,
     default="byzantium",
+)
+contract_address_option = click.option(
+    "--contract-address",
+    help=("The address of the deployed contract, '0x' prefixed string"),
+    type=str,
+    required=True,
+    callback=validate_address,
 )
 
 
@@ -199,13 +217,75 @@ def deploy(
     contract = deploy_compiled_contract(
         abi=abi,
         bytecode=bytecode,
-        constructor_args=parse_args_to_matching_types(args, abi),
+        constructor_args=parse_args_to_matching_types_for_constructor(args, abi),
         web3=web3,
         transaction_options=transaction_options,
         private_key=private_key,
     )
 
     click.echo(contract.address)
+
+
+@main.command(short_help="Sends a transaction to a contract function")
+@click.argument("contract-name", type=str)
+@click.argument("function-name", type=str)
+@click.argument("args", nargs=-1, type=str)
+@gas_option
+@gas_price_option
+@nonce_option
+@auto_nonce_option
+@keystore_option
+@jsonrpc_option
+@contracts_dir_option
+@optimize_option
+@evm_version_option
+@contract_address_option
+def send_transaction_to_contract(
+    contract_name: str,
+    function_name: str,
+    args: Sequence[str],
+    gas: int,
+    gas_price: int,
+    nonce: int,
+    auto_nonce: bool,
+    keystore: str,
+    jsonrpc: str,
+    contracts_dir,
+    contract_address,
+    optimize,
+    evm_version,
+):
+    web3 = connect_to_json_rpc(jsonrpc)
+    private_key = retrieve_private_key(keystore)
+
+    nonce = get_nonce(
+        web3=web3, nonce=nonce, auto_nonce=auto_nonce, private_key=private_key
+    )
+    transaction_options = build_transaction_options(
+        gas=gas, gas_price=gas_price, nonce=nonce
+    )
+
+    compiled_contracts = compile_project(
+        contracts_dir, optimize=optimize, evm_version=evm_version
+    )
+
+    if contract_name not in compiled_contracts:
+        raise click.BadArgumentUsage(f"Contract {contract_name} was not found.")
+
+    contract_abi = compiled_contracts[contract_name]["abi"]
+    contract = web3.eth.contract(abi=contract_abi, address=contract_address)
+    function_abi = get_contract_matching_function(contract_abi, function_name, args)
+    parsed_arguments = parse_args_to_matching_types_for_function(args, function_abi)
+    function_call = contract.functions[function_name](*parsed_arguments)
+
+    receipt = send_function_call_transaction(
+        function_call,
+        web3=web3,
+        transaction_options=transaction_options,
+        private_key=private_key,
+    )
+
+    click.echo(encode_hex(receipt.transactionHash))
 
 
 def connect_to_json_rpc(jsonrpc) -> Web3:
@@ -255,13 +335,34 @@ def get_nonce(*, web3: Web3, nonce: int, auto_nonce: bool, private_key: bytes):
         return nonce
 
 
-def parse_args_to_matching_types(args, abi):
+def get_contract_matching_function(contract_abi, function_name, args):
+    candidates = [
+        abi
+        for abi in contract_abi
+        if abi["type"] == "function"
+        and abi["name"] == function_name
+        and len(abi["inputs"]) == len(args)
+    ]
+
+    if len(candidates) == 1:
+        return candidates[0]
+    elif len(candidates) == 0:
+        raise ValueError("Found no function matching the name and input length.")
+    elif len(candidates) > 1:
+        raise ValueError("Found multiple function matching name and input length.")
+
+
+def parse_args_to_matching_types_for_constructor(args, contract_abi):
     """Parses a list of commandline arguments to the abi matching python types"""
-    constructor_abi = get_constructor_abi(abi)
+    constructor_abi = get_constructor_abi(contract_abi)
     if constructor_abi:
-        types = get_abi_input_types(constructor_abi)
-        return [parse_arg_to_matching_type(arg, type) for arg, type in zip(args, types)]
+        return parse_args_to_matching_types_for_function(args, constructor_abi)
     return []
+
+
+def parse_args_to_matching_types_for_function(args, function_abi):
+    types = get_abi_input_types(function_abi)
+    return [parse_arg_to_matching_type(arg, type) for arg, type in zip(args, types)]
 
 
 def parse_arg_to_matching_type(arg, type: str):
@@ -281,12 +382,3 @@ def parse_arg_to_matching_type(arg, type: str):
     ):
         return arg
     raise ValueError(f"Cannot handle parameter of type {type} yet.")
-
-
-def validate_address(ctx, param, value):
-    try:
-        return validate_and_format_address(value)
-    except InvalidAddressException as e:
-        raise click.BadParameter(
-            f"The address parameter is not recognized to be an address: {value}"
-        ) from e
