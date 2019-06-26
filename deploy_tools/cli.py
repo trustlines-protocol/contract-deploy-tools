@@ -238,7 +238,7 @@ def deploy(
 @jsonrpc_option
 @contracts_dir_option
 @contract_address_option
-def send_transaction_to_contract(
+def transact(
     contract_name: str,
     function_name: str,
     args: Sequence[str],

@@ -202,7 +202,7 @@ def test_send_transaction_to_contract(
     result = runner.invoke(
         main,
         (
-            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"transact -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
             f"-- {test_contract_name} set 1"
         ),
     )
@@ -222,7 +222,7 @@ def test_send_transaction_to_contract_find_duplicated_function_by_argument_lengt
     result = runner.invoke(
         main,
         (
-            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"transact -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
             f"-- {test_contract_name} duplicatedDifferentArgumentLength 1"
         ),
     )
@@ -242,7 +242,7 @@ def test_send_transaction_to_contract_can_not_find_duplicated_function_same_argu
     result = runner.invoke(
         main,
         (
-            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"transact -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
             f"-- {test_contract_name} duplicatedSameArgumentLength 1"
         ),
     )
@@ -258,7 +258,7 @@ def test_send_transaction_to_contract_non_existing_function(
     result = runner.invoke(
         main,
         (
-            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"transact -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
             f"-- {test_contract_name} unknown 1"
         ),
     )
@@ -272,7 +272,7 @@ def test_send_transaction_to_contract_wrong_address_format(runner, test_contract
     result = runner.invoke(
         main,
         (
-            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address "
+            f"transact -d testcontracts --jsonrpc test --contract-address "
             f"0x25D4760c08b4bf8e99c3658 -- {test_contract_name} set 1"
         ),
     )
@@ -287,7 +287,7 @@ def test_send_transaction_to_contract_insufficient_gas(
     result = runner.invoke(
         main,
         (
-            f"send-transaction-to-contract -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"transact -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
             f"--gas 1 -- {test_contract_name} set 1"
         ),
     )
