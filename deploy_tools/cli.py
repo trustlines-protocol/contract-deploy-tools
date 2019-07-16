@@ -1,4 +1,5 @@
 from typing import Sequence
+from pathlib import Path
 
 import click
 from web3 import Web3, EthereumTesterProvider, Account
@@ -11,6 +12,7 @@ from .files import (
     write_minified_json_asset,
     validate_and_format_address,
     InvalidAddressException,
+    load_json_asset,
 )
 from .deploy import (
     decrypt_private_key,
@@ -73,8 +75,6 @@ contracts_dir_option = click.option(
     "--contracts-dir",
     "-d",
     help="Directory of the contracts sources",
-    default="contracts",
-    show_default=True,
     type=click.Path(file_okay=False, exists=True),
 )
 optimize_option = click.option(
@@ -92,9 +92,15 @@ evm_version_option = click.option(
     show_default=True,
     default="byzantium",
 )
+compiled_contracts_path_option = click.option(
+    "--compiled-contracts",
+    "compiled_contracts_path",
+    help="Path to the compiled contracts json file",
+    type=click.Path(file_okay=True, exists=True),
+)
 contract_address_option = click.option(
     "--contract-address",
-    help=("The address of the deployed contract, '0x' prefixed string"),
+    help="The address of the deployed contract, '0x' prefixed string",
     type=str,
     required=True,
     callback=validate_address,
@@ -175,6 +181,7 @@ def compile(
 @contracts_dir_option
 @optimize_option
 @evm_version_option
+@compiled_contracts_path_option
 def deploy(
     contract_name: str,
     args: Sequence[str],
@@ -187,6 +194,7 @@ def deploy(
     contracts_dir,
     optimize,
     evm_version,
+    compiled_contracts_path: str,
 ):
     """
     Deploys a contract
@@ -204,8 +212,11 @@ def deploy(
         gas=gas, gas_price=gas_price, nonce=nonce
     )
 
-    compiled_contracts = compile_project(
-        contracts_dir, optimize=optimize, evm_version=evm_version
+    compiled_contracts = get_compiled_contracts(
+        contracts_dir=contracts_dir,
+        optimize=optimize,
+        evm_version=evm_version,
+        compiled_contracts_path=compiled_contracts_path,
     )
 
     if contract_name not in compiled_contracts:
@@ -237,6 +248,7 @@ def deploy(
 @keystore_option
 @jsonrpc_option
 @contracts_dir_option
+@compiled_contracts_path_option
 @contract_address_option
 def transact(
     contract_name: str,
@@ -249,6 +261,7 @@ def transact(
     keystore: str,
     jsonrpc: str,
     contracts_dir,
+    compiled_contracts_path,
     contract_address,
 ):
     web3 = connect_to_json_rpc(jsonrpc)
@@ -261,7 +274,9 @@ def transact(
         gas=gas, gas_price=gas_price, nonce=nonce
     )
 
-    compiled_contracts = compile_project(contracts_dir)
+    compiled_contracts = get_compiled_contracts(
+        contracts_dir=contracts_dir, compiled_contracts_path=compiled_contracts_path
+    )
 
     if contract_name not in compiled_contracts:
         raise click.BadArgumentUsage(f"Contract {contract_name} was not found.")
@@ -288,6 +303,7 @@ def transact(
 @click.argument("args", nargs=-1, type=str)
 @jsonrpc_option
 @contracts_dir_option
+@compiled_contracts_path_option
 @contract_address_option
 def call(
     contract_name: str,
@@ -296,10 +312,13 @@ def call(
     jsonrpc: str,
     contracts_dir,
     contract_address,
+    compiled_contracts_path,
 ):
     web3 = connect_to_json_rpc(jsonrpc)
 
-    compiled_contracts = compile_project(contracts_dir)
+    compiled_contracts = get_compiled_contracts(
+        contracts_dir=contracts_dir, compiled_contracts_path=compiled_contracts_path
+    )
 
     if contract_name not in compiled_contracts:
         raise click.BadArgumentUsage(f"Contract {contract_name} was not found.")
@@ -311,6 +330,28 @@ def call(
     result = contract.functions[function_name](*parsed_arguments).call()
 
     click.echo(result)
+
+
+def get_compiled_contracts(
+    *, contracts_dir, optimize=False, evm_version="byzantium", compiled_contracts_path
+):
+    if contracts_dir is not None and compiled_contracts_path is not None:
+        raise click.BadOptionUsage(
+            "--contracts-dir, --compiled-contracts",
+            f"Both --contracts-dir and --compiled-contracts were specified. Please only use one of the two.",
+        )
+    if compiled_contracts_path is not None:
+        return load_json_asset(compiled_contracts_path)
+    else:
+        if contracts_dir is None:
+            contracts_dir = "contracts"
+        if not Path(contracts_dir).is_dir():
+            raise click.BadOptionUsage(
+                "--contracts-dir", f'Contract directory not found: "{contracts_dir}"'
+            )
+        return compile_project(
+            contracts_dir, optimize=optimize, evm_version=evm_version
+        )
 
 
 def connect_to_json_rpc(jsonrpc) -> Web3:

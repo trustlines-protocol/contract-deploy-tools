@@ -75,6 +75,21 @@ def go_to_root_dir():
     os.chdir(current_path)
 
 
+@pytest.fixture()
+def compiled_contracts_path(go_to_root_dir, runner):
+    compiled_contracts_path = "build/contracts.json"
+    result = runner.invoke(
+        main, f"compile -d testcontracts -o {compiled_contracts_path}"
+    )
+    assert result.exit_code == 0
+
+    with open(compiled_contracts_path) as f:
+        contract_assets = json.load(f)
+        assert "TestContract" in contract_assets
+
+    return compiled_contracts_path
+
+
 @pytest.mark.usefixtures("go_to_root_dir")
 def test_default_compile(runner):
     result = runner.invoke(main, "compile -d testcontracts")
@@ -134,7 +149,40 @@ def test_deploy_simple_contract(runner):
 
 
 @pytest.mark.usefixtures("go_to_root_dir")
-def test_contract_with_arguments(runner):
+def test_deploy_no_contracts_directory(runner):
+    result = runner.invoke(main, "deploy OtherContract --jsonrpc test")
+    assert result.exit_code == 2
+    assert 'Contract directory not found: "contracts"' in result.output[:-1]
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_deploy_contracts_dir_and_compiled_contracts(runner, compiled_contracts_path):
+    result = runner.invoke(
+        main,
+        f"deploy OtherContract -d testcontracts --compiled-contracts"
+        f" {compiled_contracts_path} --jsonrpc test",
+    )
+    assert result.exit_code == 2
+    assert (
+        "Both --contracts-dir and --compiled-contracts were specified. Please only use one of the two"
+        in result.output[:-1]
+    )
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_deploy_simple_contract_from_compiled_contracts(
+    runner, compiled_contracts_path
+):
+    result = runner.invoke(
+        main,
+        f"deploy OtherContract --compiled-contracts {compiled_contracts_path} --jsonrpc test",
+    )
+    assert result.exit_code == 0
+    assert is_address(result.output[:-1])
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_deploy_contract_with_arguments(runner):
     result = runner.invoke(
         main,
         "deploy -d testcontracts --jsonrpc test -- ManyArgumentsContract "
@@ -145,7 +193,7 @@ def test_contract_with_arguments(runner):
 
 
 @pytest.mark.usefixtures("go_to_root_dir")
-def test_transaction_parameters(runner):
+def test_deploy_transaction_parameters(runner):
     result = runner.invoke(
         main,
         "deploy OtherContract -d testcontracts --jsonrpc test "
@@ -156,7 +204,7 @@ def test_transaction_parameters(runner):
 
 
 @pytest.mark.usefixtures("go_to_root_dir")
-def test_transaction_parameters_wrong_gas(runner):
+def test_deploy_transaction_parameters_wrong_gas(runner):
     result = runner.invoke(
         main,
         "deploy OtherContract -d testcontracts --jsonrpc test "
@@ -166,7 +214,7 @@ def test_transaction_parameters_wrong_gas(runner):
 
 
 @pytest.mark.usefixtures("go_to_root_dir")
-def test_transaction_parameters_wrong_gas_price(runner):
+def test_deploy_transaction_parameters_wrong_gas_price(runner):
     result = runner.invoke(
         main,
         "deploy OtherContract -d testcontracts --jsonrpc test "
@@ -176,7 +224,7 @@ def test_transaction_parameters_wrong_gas_price(runner):
 
 
 @pytest.mark.usefixtures("go_to_root_dir")
-def test_keystore(runner, keystore_file_path, key_password):
+def test_deploy_keystore(runner, keystore_file_path, key_password):
     result = runner.invoke(
         main,
         f"deploy OtherContract -d testcontracts --jsonrpc test --keystore {keystore_file_path}",
@@ -186,7 +234,7 @@ def test_keystore(runner, keystore_file_path, key_password):
 
 
 @pytest.mark.usefixtures("go_to_root_dir")
-def test_keystore_wrong_nonce(runner, keystore_file_path, key_password):
+def test_deploy_keystore_wrong_nonce(runner, keystore_file_path, key_password):
     result = runner.invoke(
         main,
         f"deploy OtherContract -d testcontracts --jsonrpc test --nonce 100 --keystore {keystore_file_path}",
@@ -207,6 +255,26 @@ def test_send_transaction_to_contract(
         ),
     )
 
+    assert result.exit_code == 0
+
+    transaction_hash = result.output.splitlines()[-1]
+
+    assert is_hex(transaction_hash)
+    assert is_0x_prefixed(transaction_hash)
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_send_transaction_to_contract_from_compiled_contracts(
+    runner, test_contract_address, test_contract_name, compiled_contracts_path
+):
+    result = runner.invoke(
+        main,
+        (
+            f"transact --compiled-contracts {compiled_contracts_path} "
+            f"--jsonrpc test --contract-address {test_contract_address} "
+            f"-- {test_contract_name} set 1"
+        ),
+    )
     assert result.exit_code == 0
 
     transaction_hash = result.output.splitlines()[-1]
@@ -302,6 +370,23 @@ def test_call_contract_function(runner, test_contract_address, test_contract_nam
         main,
         (
             f"call -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"-- {test_contract_name} state"
+        ),
+    )
+
+    assert result.exit_code == 0
+    assert result.output.strip() == "4"
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_call_contract_function_from_compiled_contracts(
+    runner, test_contract_address, test_contract_name, compiled_contracts_path
+):
+    result = runner.invoke(
+        main,
+        (
+            f"call --compiled-contracts {compiled_contracts_path} --jsonrpc test"
+            f" --contract-address {test_contract_address} "
             f"-- {test_contract_name} state"
         ),
     )

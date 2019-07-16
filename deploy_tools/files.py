@@ -29,6 +29,11 @@ def write_minified_json_asset(json_data: Dict, compiled_contracts_asset_path: st
         json.dump(json_data, file, separators=(",", ":"))
 
 
+def load_json_asset(asset_path: str):
+    with open(asset_path, "r") as file:
+        return json.load(file)
+
+
 def read_addresses_in_csv(file_path: str):
     with open(file_path) as f:
         reader = csv.reader(f)
