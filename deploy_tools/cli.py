@@ -29,6 +29,8 @@ from .compile import filter_contracts, UnknownContractException, compile_project
 test_provider = EthereumTesterProvider()
 test_json_rpc = Web3(test_provider)
 
+CONTRACTS_DIR_DEFAULT = "contracts"
+
 
 def validate_address(ctx, param, value):
     try:
@@ -74,7 +76,7 @@ auto_nonce_option = click.option(
 contracts_dir_option = click.option(
     "--contracts-dir",
     "-d",
-    help="Directory of the contracts sources",
+    help=f"Directory of the contracts sources [default: {CONTRACTS_DIR_DEFAULT}]",
     type=click.Path(file_okay=False, exists=True),
 )
 optimize_option = click.option(
@@ -150,7 +152,7 @@ def compile(
     ensure_path_for_file_exists(output)
 
     if contracts_dir is None:
-        contracts_dir = "contracts"
+        contracts_dir = CONTRACTS_DIR_DEFAULT
     verify_contracts_dir_exists(contracts_dir)
 
     try:
@@ -348,7 +350,7 @@ def get_compiled_contracts(
         return load_json_asset(compiled_contracts_path)
     else:
         if contracts_dir is None:
-            contracts_dir = "contracts"
+            contracts_dir = CONTRACTS_DIR_DEFAULT
         verify_contracts_dir_exists(contracts_dir)
         return compile_project(
             contracts_dir, optimize=optimize, evm_version=evm_version
