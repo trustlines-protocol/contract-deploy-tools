@@ -149,6 +149,10 @@ def compile(
 
     ensure_path_for_file_exists(output)
 
+    if contracts_dir is None:
+        contracts_dir = "contracts"
+    verify_contracts_dir_exists(contracts_dir)
+
     try:
         compiled_contracts = filter_contracts(
             contract_names,
@@ -345,12 +349,16 @@ def get_compiled_contracts(
     else:
         if contracts_dir is None:
             contracts_dir = "contracts"
-        if not Path(contracts_dir).is_dir():
-            raise click.BadOptionUsage(
-                "--contracts-dir", f'Contract directory not found: "{contracts_dir}"'
-            )
+        verify_contracts_dir_exists(contracts_dir)
         return compile_project(
             contracts_dir, optimize=optimize, evm_version=evm_version
+        )
+
+
+def verify_contracts_dir_exists(contracts_dir):
+    if not Path(contracts_dir).is_dir():
+        raise click.BadOptionUsage(
+            "--contracts-dir", f'Contract directory not found: "{contracts_dir}"'
         )
 
 
