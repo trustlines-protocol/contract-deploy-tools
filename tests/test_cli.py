@@ -393,3 +393,31 @@ def test_call_contract_function_from_compiled_contracts(
 
     assert result.exit_code == 0
     assert result.output.strip() == "4"
+
+
+def test_generate_keystore(runner, tmpdir, key_password):
+    keystore_path = tmpdir.join("test_keystore.json")
+
+    assert not keystore_path.exists()
+
+    result = runner.invoke(
+        main,
+        (f"generate-keystore --keystore-path {keystore_path}"),
+        input=f"{key_password}\n{key_password}",
+    )
+    assert result.exit_code == 0
+    assert keystore_path.exists()
+
+
+def test_generate_keystore_fail_existing_file(runner, tmpdir, key_password):
+    keystore_path = tmpdir.join("test_keystore.json")
+    keystore_path.ensure(File=True)
+
+    assert keystore_path.exists()
+
+    result = runner.invoke(
+        main,
+        (f"generate-keystore --keystore-path {keystore_path}"),
+        input=f"{key_password}\n{key_password}",
+    )
+    assert result.exit_code == 2

@@ -1,6 +1,8 @@
 from typing import Sequence
 from pathlib import Path
+from os import path
 
+import json
 import click
 from web3 import Web3, EthereumTesterProvider, Account
 from web3._utils.abi import get_constructor_abi, get_abi_input_types
@@ -30,6 +32,7 @@ test_provider = EthereumTesterProvider()
 test_json_rpc = Web3(test_provider)
 
 CONTRACTS_DIR_DEFAULT = "contracts"
+KEYSTORE_FILE_SAVE_DEFAULT = "keystore.json"
 
 
 def validate_address(ctx, param, value):
@@ -106,6 +109,13 @@ contract_address_option = click.option(
     type=str,
     required=True,
     callback=validate_address,
+)
+keystore_file_save_option = click.option(
+    "--keystore-path",
+    help=f"Path where to store the new keystore file",
+    type=click.Path(exists=False, resolve_path=True),
+    default=KEYSTORE_FILE_SAVE_DEFAULT,
+    show_default=True,
 )
 
 
@@ -336,6 +346,30 @@ def call(
     result = contract.functions[function_name](*parsed_arguments).call()
 
     click.echo(result)
+
+
+@main.command(short_help="Generate a new encrypted keystore file")
+@keystore_file_save_option
+def generate_keystore(keystore_path: str):
+    if path.exists(keystore_path):
+        raise click.BadOptionUsage(
+            "--keystore-file", f"The file {keystore_path} does already exist!"
+        )
+
+    account = Account.create()
+    password = click.prompt(
+        "Please enter the password to encrypt the keystore",
+        type=str,
+        hide_input=True,
+        confirmation_prompt=True,
+    )
+    keystore = account.encrypt(password=password)
+
+    with open(keystore_path, "w") as file:
+        file.write(json.dumps(keystore))
+        file.close()
+
+    click.echo(f"Stored new keystore: {keystore_path}")
 
 
 def get_compiled_contracts(
