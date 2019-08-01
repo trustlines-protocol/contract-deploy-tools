@@ -355,7 +355,7 @@ def call(
 
 
 @main.command(
-    short_help="Generates an encrypted keystore file. Creates a new private key of none is provided."
+    short_help="Generates an encrypted keystore file. Creates a new account if no private key is provided."
 )
 @keystore_file_save_option
 @private_key_option
