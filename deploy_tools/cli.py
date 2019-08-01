@@ -112,10 +112,16 @@ contract_address_option = click.option(
 )
 keystore_file_save_option = click.option(
     "--keystore-path",
-    help=f"Path where to store the new keystore file",
+    help=f"Path where to store the keystore file",
     type=click.Path(exists=False, resolve_path=True),
     default=KEYSTORE_FILE_SAVE_DEFAULT,
     show_default=True,
+)
+private_key_option = click.option(
+    "--private-key",
+    help="Private key in hex string representation",
+    type=str,
+    default=None,
 )
 
 
@@ -348,15 +354,22 @@ def call(
     click.echo(result)
 
 
-@main.command(short_help="Generate a new encrypted keystore file")
+@main.command(
+    short_help="Generates an encrypted keystore file. Creates a new private key of none is provided."
+)
 @keystore_file_save_option
-def generate_keystore(keystore_path: str):
+@private_key_option
+def generate_keystore(keystore_path: str, private_key: str):
     if path.exists(keystore_path):
-        raise click.BadOptionUsage(
+        raise click.BadOptionUsage(  # type: ignore
             "--keystore-file", f"The file {keystore_path} does already exist!"
         )
 
-    account = Account.create()
+    if private_key:
+        account = Account.from_key(private_key)
+    else:
+        account = Account.create()
+
     password = click.prompt(
         "Please enter the password to encrypt the keystore",
         type=str,
@@ -369,7 +382,7 @@ def generate_keystore(keystore_path: str):
         file.write(json.dumps(keystore))
         file.close()
 
-    click.echo(f"Stored new keystore: {keystore_path}")
+    click.echo(f"Stored keystore for {account.address} at {keystore_path}")
 
 
 def get_compiled_contracts(

@@ -90,6 +90,16 @@ def compiled_contracts_path(go_to_root_dir, runner):
     return compiled_contracts_path
 
 
+@pytest.fixture()
+def keystore_file_save_path(tmpdir):
+    return tmpdir.join("test_keystore.json")
+
+
+@pytest.fixture()
+def private_key(account_keys):
+    return account_keys[0]
+
+
 @pytest.mark.usefixtures("go_to_root_dir")
 def test_default_compile(runner):
     result = runner.invoke(main, "compile -d testcontracts")
@@ -395,29 +405,45 @@ def test_call_contract_function_from_compiled_contracts(
     assert result.output.strip() == "4"
 
 
-def test_generate_keystore(runner, tmpdir, key_password):
-    keystore_path = tmpdir.join("test_keystore.json")
-
-    assert not keystore_path.exists()
+def test_generate_keystore_generate_new_private_key(
+    runner, keystore_file_save_path, key_password
+):
+    assert not keystore_file_save_path.exists()
 
     result = runner.invoke(
         main,
-        (f"generate-keystore --keystore-path {keystore_path}"),
+        (f"generate-keystore --keystore-path {keystore_file_save_path}"),
         input=f"{key_password}\n{key_password}",
     )
     assert result.exit_code == 0
-    assert keystore_path.exists()
+    assert keystore_file_save_path.exists()
 
 
-def test_generate_keystore_fail_existing_file(runner, tmpdir, key_password):
-    keystore_path = tmpdir.join("test_keystore.json")
-    keystore_path.ensure(File=True)
+def test_generate_keystore_fail_existing_file(
+    runner, keystore_file_save_path, key_password
+):
+    keystore_file_save_path.ensure(File=True)
 
-    assert keystore_path.exists()
+    assert keystore_file_save_path.exists()
 
     result = runner.invoke(
         main,
-        (f"generate-keystore --keystore-path {keystore_path}"),
+        (f"generate-keystore --keystore-path {keystore_file_save_path}"),
         input=f"{key_password}\n{key_password}",
     )
     assert result.exit_code == 2
+
+
+def test_generate_keystore_from_private_key(
+    runner, keystore_file_save_path, private_key, key_password
+):
+    result = runner.invoke(
+        main,
+        (
+            f"generate-keystore --keystore-path {keystore_file_save_path} "
+            f"--private-key {private_key.to_hex()}"
+        ),
+        input=f"{key_password}\n{key_password}",
+    )
+
+    assert result.exit_code == 0
