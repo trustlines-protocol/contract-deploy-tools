@@ -113,7 +113,7 @@ contract_address_option = click.option(
 keystore_file_save_option = click.option(
     "--keystore-path",
     help=f"Path where to store the keystore file",
-    type=click.Path(exists=False, resolve_path=True),
+    type=click.Path(resolve_path=True),
     default=KEYSTORE_FILE_SAVE_DEFAULT,
     show_default=True,
 )
