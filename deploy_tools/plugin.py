@@ -49,7 +49,19 @@ def remove_click_options_environment_variables():
     Otherwise they will interfere with the tests.
     """
     for env_var in list(os.environ.keys()):
-        if env_var.startswith("DEPLOY_TOOLS_"):
+        if env_var.startswith(
+            (
+                "JSONRPC",
+                "KEYSTORE",
+                "GAS",
+                "GAS_PRICE",
+                "AUTO_NONCE",
+                "CONTRACTS_DIR",
+                "OPTIMIZE",
+                "EVM_VERSION",
+                "COMPILED_CONTRACTS",
+            )
+        ):
             del os.environ[env_var]
 
 

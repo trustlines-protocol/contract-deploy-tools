@@ -50,28 +50,28 @@ jsonrpc_option = click.option(
     default="http://127.0.0.1:8545",
     show_default=True,
     metavar="URL",
-    envvar="DEPLOY_TOOLS_JSONRPC",
+    envvar="JSONRPC",
 )
 keystore_option = click.option(
     "--keystore",
     help="Path to the encrypted keystore",
     type=click.Path(exists=True, dir_okay=False),
     default=None,
-    envvar="DEPLOY_TOOLS_KEYSTORE",
+    envvar="KEYSTORE",
 )
 gas_option = click.option(
     "--gas",
     help="Gas of the transaction to be sent",
     type=int,
     default=None,
-    envvar="DEPLOY_TOOLS_GAS",
+    envvar="GAS",
 )
 gas_price_option = click.option(
     "--gas-price",
     help="Gas price of the transaction to be sent",
     type=int,
     default=None,
-    envvar="DEPLOY_TOOLS_GAS_PRICE",
+    envvar="GAS_PRICE",
 )
 nonce_option = click.option(
     "--nonce", help="Nonce of the first transaction to be sent", type=int, default=None
@@ -81,14 +81,14 @@ auto_nonce_option = click.option(
     help="automatically determine the nonce of first transaction to be sent",
     default=False,
     is_flag=True,
-    envvar="DEPLOY_TOOLS_AUTO_NONCE",
+    envvar="AUTO_NONCE",
 )
 contracts_dir_option = click.option(
     "--contracts-dir",
     "-d",
     help=f"Directory of the contracts sources [default: {CONTRACTS_DIR_DEFAULT}]",
     type=click.Path(file_okay=False, exists=True),
-    envvar="DEPLOY_TOOLS_CONTRACTS_DIR",
+    envvar="CONTRACTS_DIR",
 )
 optimize_option = click.option(
     "--optimize",
@@ -96,7 +96,7 @@ optimize_option = click.option(
     default=False,
     help="Turns on the solidity optimizer",
     is_flag=True,
-    envvar="DEPLOY_TOOLS_OPTIMIZE",
+    envvar="OPTIMIZE",
 )
 evm_version_option = click.option(
     "--evm-version",
@@ -105,14 +105,14 @@ evm_version_option = click.option(
     "petersburg, constantinople, byzantium, spuriousDragon, tangerineWhistle, or homestead",
     show_default=True,
     default="byzantium",
-    envvar="DEPLOY_TOOLS_EVM_VERSION",
+    envvar="EVM_VERSION",
 )
 compiled_contracts_path_option = click.option(
     "--compiled-contracts",
     "compiled_contracts_path",
     help="Path to the compiled contracts json file",
     type=click.Path(file_okay=True, exists=True),
-    envvar="DEPLOY_TOOLS_COMPILED_CONTRACTS",
+    envvar="COMPILED_CONTRACTS",
 )
 contract_address_option = click.option(
     "--contract-address",
