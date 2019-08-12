@@ -127,4 +127,4 @@ def _build_and_sign_transaction(
 
     transaction = fill_nonce(web3, function_call.buildTransaction(transaction_options))
 
-    return account.signTransaction(transaction)
+    return account.sign_transaction(transaction)

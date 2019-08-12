@@ -463,7 +463,7 @@ def get_nonce(*, web3: Web3, nonce: int, auto_nonce: bool, private_key: bytes):
 
     if auto_nonce:
         return web3.eth.getTransactionCount(
-            Account.privateKeyToAccount(private_key).address, block_identifier="pending"
+            Account.from_key(private_key).address, block_identifier="pending"
         )
     else:
         return nonce
