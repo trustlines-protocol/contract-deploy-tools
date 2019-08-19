@@ -6,6 +6,10 @@ Change Log
 -------------------------------
 
 
+`0.5.1`_ (2019-08-19)
+-------------------------------
+* Add the  ``--optimize-runs`` option to the ``compile`` command
+
 `0.5.0`_ (2019-08-15)
 -------------------------------
 * Change ``--optimize`` to a toggle option with default ``True``
@@ -78,4 +82,5 @@ Change Log
 .. _0.4.3: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.4.2...0.4.3
 .. _0.4.4: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.4.3...0.4.4
 .. _0.5.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.4.4...0.5.0
-.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.0...master
+.. _0.5.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.0...0.5.1
+.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.1...master

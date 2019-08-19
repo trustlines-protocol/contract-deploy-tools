@@ -97,6 +97,14 @@ optimize_option = click.option(
     help="Toggles the solidity optimizer",
     envvar="OPTIMIZE",
 )
+optimize_runs_option = click.option(
+    "--optimize-runs",
+    default=500,
+    type=int,
+    show_default=True,
+    help="Number of contract runs to optimize for when compiling contracts",
+    envvar="OPTIMIZE_RUNS",
+)
 evm_version_option = click.option(
     "--evm-version",
     type=str,
@@ -149,6 +157,7 @@ def main():
 @main.command(short_help="Compile all contracts")
 @contracts_dir_option
 @optimize_option
+@optimize_runs_option
 @evm_version_option
 @click.option(
     "--only-abi",
@@ -176,7 +185,14 @@ def main():
     default="build/contracts.json",
 )
 def compile(
-    contracts_dir, optimize, evm_version, only_abi, minimize, contract_names, output
+    contracts_dir,
+    optimize,
+    optimize_runs,
+    evm_version,
+    only_abi,
+    minimize,
+    contract_names,
+    output,
 ):
     if contract_names is not None:
         contract_names = contract_names.split(",")
@@ -193,6 +209,7 @@ def compile(
             compile_project(
                 contracts_dir,
                 optimize=optimize,
+                optimize_runs=optimize_runs,
                 only_abi=only_abi,
                 evm_version=evm_version,
             ),

@@ -86,6 +86,7 @@ def compile_project(
     allow_paths: List[str] = None,
     pattern="*.sol",
     optimize=True,
+    optimize_runs=500,
     only_abi=False,
     evm_version: str = "petersburg",
 ):
@@ -97,6 +98,7 @@ def compile_project(
         allow_paths: Additional paths from where it is allowed to load contracts
         pattern: The pattern to find the solidity files
         optimize: Whether to turn on the solidity optimizer
+        optimize_runs: Number of contract runs to optimize for
         only_abi: Whether to only create the abi or not
         evm_version: target evm version to use for generated code
 
@@ -134,7 +136,7 @@ def compile_project(
     }
 
     if optimize:
-        std_input["settings"]["optimizer"] = {"enabled": True, "runs": 500}
+        std_input["settings"]["optimizer"] = {"enabled": True, "runs": optimize_runs}
 
     compilation_result = compile_standard(
         std_input, allow_paths=",".join(os.path.abspath(path) for path in allow_paths)
