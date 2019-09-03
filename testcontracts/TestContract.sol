@@ -40,4 +40,8 @@ contract TestContract {
         return a;
     }
 
+    function failingFunction() public pure returns (bytes memory) {
+        require(false, "This function can only fail.");
+    }
+
 }
