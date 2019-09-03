@@ -2,7 +2,11 @@ import pytest
 import eth_utils
 from eth_utils import is_address
 
-from deploy_tools.deploy import deploy_compiled_contract, send_function_call_transaction
+from deploy_tools.deploy import (
+    deploy_compiled_contract,
+    send_function_call_transaction,
+    TransactionFailed,
+)
 from deploy_tools.plugin import get_contracts_folder
 from deploy_tools.compile import compile_project
 
@@ -110,6 +114,23 @@ def test_send_contract_call_set_nonce(test_contract, web3, account_keys):
         send_function_call_transaction(
             function_call,
             transaction_options={"nonce": nonce},
+            web3=web3,
+            private_key=account_keys[2],
+        )
+
+
+def test_wait_for_successful_tx_receipt(test_contract, web3, account_keys):
+    """
+    Test that `wait_for_successful_tx_receipt` will catch that this transaction fails and raise an error
+    """
+    function_call = test_contract.functions.failingFunction()
+
+    with pytest.raises(TransactionFailed):
+        # We have to assign gas to make sure eth_tester will not check for transaction success
+        # and leave this job to deploy_tool
+        send_function_call_transaction(
+            function_call,
+            transaction_options={"gas": 123456},
             web3=web3,
             private_key=account_keys[2],
         )

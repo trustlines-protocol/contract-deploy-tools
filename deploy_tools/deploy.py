@@ -16,7 +16,7 @@ def deploy_compiled_contract(
     web3: Web3,
     constructor_args=(),
     transaction_options: Dict = None,
-    private_key=None
+    private_key=None,
 ) -> Contract:
     """
     Deploys a compiled contract either using an account of the node, or a local private key
@@ -77,9 +77,14 @@ def wait_for_successful_transaction_receipt(web3: Web3, txid: str, timeout=180) 
     """
     receipt = web3.eth.waitForTransactionReceipt(txid, timeout=timeout)
     status = receipt.get("status", None)
-    if status is False:
+    if status == 0:
         raise TransactionFailed
-    return receipt
+    elif status == 1:
+        return receipt
+    else:
+        raise ValueError(
+            f"Unexpected value for status in the transaction receipt: {status}"
+        )
 
 
 def load_contracts_json(package_name, filename="contracts.json") -> Dict:
