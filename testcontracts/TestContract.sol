@@ -32,6 +32,9 @@ contract TestContract {
         state = a + b;
     }
 
+    function functionWithArrayArgument(address[] memory a) public {
+    }
+
     function duplicatedSameArgumentLength(uint a) public pure returns (uint) {
         return a;
     }
@@ -43,5 +46,4 @@ contract TestContract {
     function failingFunction() public pure returns (bytes memory) {
         require(false, "This function can only fail.");
     }
-
 }

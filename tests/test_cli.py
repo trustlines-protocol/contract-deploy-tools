@@ -254,6 +254,32 @@ def test_deploy_keystore_wrong_nonce(runner, keystore_file_path, key_password):
 
 
 @pytest.mark.usefixtures("go_to_root_dir")
+def test_initcode_simple_contract(runner, key_password):
+    result = runner.invoke(
+        main, f"initcode OtherContract -d testcontracts", input=key_password
+    )
+    assert result.exit_code == 0
+
+    transaction_hash = result.output.splitlines()[-1]
+
+    assert is_hex(transaction_hash)
+    assert is_0x_prefixed(transaction_hash)
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_initcode_with_constructor_argument(runner, key_password):
+    result = runner.invoke(
+        main, f"initcode TestContract 123456 -d testcontracts", input=key_password
+    )
+    assert result.exit_code == 0
+
+    transaction_hash = result.output.splitlines()[-1]
+
+    assert is_hex(transaction_hash)
+    assert is_0x_prefixed(transaction_hash)
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
 def test_send_transaction_to_contract(
     runner, test_contract_address, test_contract_name
 ):
@@ -325,6 +351,27 @@ def test_send_transaction_with_value_parameter(
     )
     assert result_final_balance_call.exit_code == 0
     assert result_final_balance_call.output.strip() == f"{transaction_value}"
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_send_transaction_to_contract_with_array_address_arguments(
+    runner, compiled_contracts_path, test_contract_address, test_contract_name
+):
+    argument = f"[{test_contract_address},{test_contract_address}]"
+    result = runner.invoke(
+        main,
+        (
+            f"transact --compiled-contracts {compiled_contracts_path} "
+            f"--jsonrpc test --contract-address {test_contract_address} "
+            f"-- {test_contract_name} functionWithArrayArgument {argument}"
+        ),
+    )
+    assert result.exit_code == 0
+
+    transaction_hash = result.output.splitlines()[-1]
+
+    assert is_hex(transaction_hash)
+    assert is_0x_prefixed(transaction_hash)
 
 
 @pytest.mark.usefixtures("go_to_root_dir")
