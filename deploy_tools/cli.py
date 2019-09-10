@@ -292,6 +292,55 @@ def deploy(
     click.echo(contract.address)
 
 
+@main.command(
+    short_help="Gives the initcode for a contract, could be used for inclusion in a chain spec"
+)
+@click.argument("contract-name", type=str)
+@click.argument("args", nargs=-1, type=str)
+@contracts_dir_option
+@optimize_option
+@evm_version_option
+@compiled_contracts_path_option
+def initcode(
+    contract_name: str,
+    args: Sequence[str],
+    contracts_dir,
+    optimize,
+    evm_version,
+    compiled_contracts_path: str,
+):
+    """
+    Does not deploy a contract but returns the initcode that should be included in the chain spec to have the contract
+    as a pre-compiled contract
+
+    Pre-compiles a contract with the name CONTRACT_NAME and the constructor arguments ARGS.
+    """
+
+    # We are not going to deploy the contract or interact with the chain.
+    # we just need to build a deploy transaction data
+    web3 = connect_to_json_rpc("test")
+
+    compiled_contracts = get_compiled_contracts(
+        contracts_dir=contracts_dir,
+        optimize=optimize,
+        evm_version=evm_version,
+        compiled_contracts_path=compiled_contracts_path,
+    )
+
+    if contract_name not in compiled_contracts:
+        raise click.BadArgumentUsage(f"Contract {contract_name} was not found.")
+
+    abi = compiled_contracts[contract_name]["abi"]
+    bytecode = compiled_contracts[contract_name]["bytecode"]
+
+    contract = web3.eth.contract(abi=abi, bytecode=bytecode)
+    tx = contract.constructor(
+        *parse_args_to_matching_types_for_constructor(args, abi)
+    ).buildTransaction()
+
+    click.echo(tx["data"])
+
+
 @main.command(short_help="Sends a transaction to a contract function")
 @click.argument("contract-name", type=str)
 @click.argument("function-name", type=str)
@@ -534,6 +583,12 @@ def parse_arg_to_matching_type(arg, type: str):
         if arg.lower() == "false":
             return False
         raise ValueError(f"Expected true or false, but got {arg}")
+    if type.find("address[]") != -1:
+        # Removes the square brackets from the string argument to return a list of checksummed addresses
+        return [
+            Web3.toChecksumAddress(_arg)
+            for _arg in arg.replace("[", "").replace("]", "").split(",")
+        ]
     if type.find("address") != -1:
         return Web3.toChecksumAddress(arg)
     if type.find("bytes") != -1 or type.find("string") != -1:
