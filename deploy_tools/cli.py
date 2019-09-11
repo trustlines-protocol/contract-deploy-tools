@@ -24,6 +24,7 @@ from .deploy import (
 )
 from .compile import filter_contracts, UnknownContractException, compile_project
 
+from web3._utils.contracts import encode_abi
 
 # we need test_provider and test_json_rpc for running the tests in test_cli
 # they need to persist between multiple calls to runner.invoke and are
@@ -293,7 +294,7 @@ def deploy(
 
 
 @main.command(
-    short_help="Gives the initcode for a contract, could be used for inclusion in a chain spec"
+    short_help="Gives the initcode for a contract, could be used for inclusion in a chain spec as a pre-compile"
 )
 @click.argument("contract-name", type=str)
 @click.argument("args", nargs=-1, type=str)
@@ -311,14 +312,10 @@ def initcode(
 ):
     """
     Does not deploy a contract but returns the initcode that should be included in the chain spec to have the contract
-    as a pre-compiled contract
+    as a pre-compiled contract.
 
-    Pre-compiles a contract with the name CONTRACT_NAME and the constructor arguments ARGS.
+    Returns the initcode of a contract with the name CONTRACT_NAME and the constructor arguments ARGS.
     """
-
-    # We are not going to deploy the contract or interact with the chain.
-    # we just need to build a deploy transaction data
-    web3 = connect_to_json_rpc("test")
 
     compiled_contracts = get_compiled_contracts(
         contracts_dir=contracts_dir,
@@ -332,13 +329,18 @@ def initcode(
 
     abi = compiled_contracts[contract_name]["abi"]
     bytecode = compiled_contracts[contract_name]["bytecode"]
+    constructor_abi = get_constructor_abi(abi)
 
-    contract = web3.eth.contract(abi=abi, bytecode=bytecode)
-    tx = contract.constructor(
-        *parse_args_to_matching_types_for_constructor(args, abi)
-    ).buildTransaction()
+    # The initcode is the bytecode with the encoded arguments appended
+    if constructor_abi:
+        arguments = parse_args_to_matching_types_for_constructor(args, abi)
+        initcode = encode_abi(
+            web3=None, abi=constructor_abi, arguments=arguments, data=bytecode
+        )
+    else:
+        initcode = bytecode
 
-    click.echo(tx["data"])
+    click.echo(initcode)
 
 
 @main.command(short_help="Sends a transaction to a contract function")
