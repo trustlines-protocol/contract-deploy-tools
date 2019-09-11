@@ -8,7 +8,7 @@ from eth_keyfile import create_keyfile_json
 from eth_utils import is_address, is_hex, is_0x_prefixed
 from eth_utils.exceptions import ValidationError
 
-from deploy_tools.cli import main
+from deploy_tools.cli import main, parse_arg_to_matching_type
 
 
 @pytest.fixture()
@@ -356,7 +356,7 @@ def test_send_transaction_with_value_parameter(
 def test_send_transaction_to_contract_with_array_address_arguments(
     runner, compiled_contracts_path, test_contract_address, test_contract_name
 ):
-    argument = f"[{test_contract_address},{test_contract_address}]"
+    argument = f"{test_contract_address},{test_contract_address}"
     result = runner.invoke(
         main,
         (
@@ -527,3 +527,52 @@ def test_generate_keystore_from_private_key(
     )
 
     assert result.exit_code == 0
+
+
+@pytest.mark.parametrize(
+    "arg, type, expected_return",
+    [
+        ("true", "bool", True),
+        ("True", "bool", True),
+        ("123456", "uint", 123456),
+        ("123456", "int", 123456),
+        ("8", "uint8", 8),
+        ("8", "int8", 8),
+        ("256", "uint16", 256),
+        ("256", "int16", 256),
+        ("123456", "uint256", 123456),
+        ("123456", "int256", 123456),
+        ("123456,123456", "uint[]", [123456, 123456]),
+        ("123456,123456", "int[]", [123456, 123456]),
+        ("8,8", "uint8[]", [8, 8]),
+        ("8,8", "int8[]", [8, 8]),
+        ("256,256", "uint16[]", [256, 256]),
+        ("256,256", "int16[]", [256, 256]),
+        ("123456,123456", "uint256[]", [123456, 123456]),
+        ("123456,123456", "int256[]", [123456, 123456]),
+        (
+            "0xB9816fC57977D5A786E654c7CF76767be63b966e",
+            "address",
+            "0xB9816fC57977D5A786E654c7CF76767be63b966e",
+        ),
+        (
+            "0xB9816fC57977D5A786E654c7CF76767be63b966e,0xB9816fC57977D5A786E654c7CF76767be63b966e",
+            "address[]",
+            [
+                "0xB9816fC57977D5A786E654c7CF76767be63b966e",
+                "0xB9816fC57977D5A786E654c7CF76767be63b966e",
+            ],
+        ),
+        ("bobloblaw", "string", "bobloblaw"),
+    ],
+)
+def test_parse_argument_to_matching_type(arg, type, expected_return):
+    assert parse_arg_to_matching_type(arg, type) == expected_return
+
+
+@pytest.mark.parametrize(
+    "arg, type", [("bob1,bob2", "string[]"), ("[123,456],[123,456]", "int[][]")]
+)
+def test_parse_argument_not_supported_yet(arg, type):
+    with pytest.raises(ValueError, match="Cannot handle parameter of type"):
+        parse_arg_to_matching_type(arg, type)

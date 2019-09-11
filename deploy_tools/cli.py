@@ -16,6 +16,7 @@ from .files import (
     InvalidAddressException,
     load_json_asset,
 )
+import re
 from .deploy import (
     decrypt_private_key,
     build_transaction_options,
@@ -576,23 +577,31 @@ def parse_args_to_matching_types_for_function(args, function_abi):
 
 
 def parse_arg_to_matching_type(arg, type: str):
+    int_pattern = "^u?int(\\d){0,3}$"
+    int_array_pattern = "^u?int(\\d){0,3}\\[\\]$"
+    bool_pattern = "^bool$"
+    bool_array_pattern = "^bool\\[\\]$"
+    address_pattern = "^address$"
+    address_array_pattern = "^address\\[\\]$"
+    bytes_pattern = "^bytes\\d{0,2}$"
+    string_pattern = "^string$"
     """Parses a commandline argument to the abi matching python type"""
-    if type.find("int") != -1:
+    if re.match(int_pattern, type):
         return int(arg)
-    if type.find("bool") != -1:
+    if re.match(int_array_pattern, type):
+        return [int(_arg) for _arg in arg.split(",")]
+    if re.match(bool_pattern, type):
         if arg.lower() == "true":
             return True
         if arg.lower() == "false":
             return False
         raise ValueError(f"Expected true or false, but got {arg}")
-    if type.find("address[]") != -1:
-        # Removes the square brackets from the string argument to return a list of checksummed addresses
-        return [
-            Web3.toChecksumAddress(_arg)
-            for _arg in arg.replace("[", "").replace("]", "").split(",")
-        ]
-    if type.find("address") != -1:
+    if re.match(bool_array_pattern, type):
+        return [parse_arg_to_matching_type(_arg, "bool") for _arg in arg.split(",")]
+    if re.match(address_pattern, type):
         return Web3.toChecksumAddress(arg)
-    if type.find("bytes") != -1 or type.find("string") != -1:
+    if re.match(address_array_pattern, type):
+        return [Web3.toChecksumAddress(_arg) for _arg in arg.split(",")]
+    if re.match(bytes_pattern, type) or re.match(string_pattern, type):
         return arg
     raise ValueError(f"Cannot handle parameter of type {type} yet.")
