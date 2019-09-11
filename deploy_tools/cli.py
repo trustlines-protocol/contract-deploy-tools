@@ -257,7 +257,8 @@ def deploy(
     Deploys a contract
 
     Deploys a contract with the name CONTRACT_NAME and the constructor arguments ARGS.
-
+    If the constructor takes array as arguments, they should be provided without brackets separated by commas.
+    For example int[] could be 123,456,789
     """
     web3 = connect_to_json_rpc(jsonrpc)
     private_key = retrieve_private_key(keystore)
@@ -316,6 +317,8 @@ def initcode(
     as a pre-compiled contract.
 
     Returns the initcode of a contract with the name CONTRACT_NAME and the constructor arguments ARGS.
+    If the constructor takes array as arguments, they should be provided without brackets separated by commas.
+    For example int[] could be 123,456,789
     """
 
     compiled_contracts = get_compiled_contracts(
@@ -373,6 +376,12 @@ def transact(
     contract_address,
     value: Optional[int],
 ):
+    """
+    Send a transaction to a contract CONTRACT_NAME calling function FUNCTION_NAME with arguments ARGS.
+
+    If the function takes array as arguments, they should be provided without brackets separated by commas.
+    For example int[] could be 123,456,789
+    """
     web3 = connect_to_json_rpc(jsonrpc)
     private_key = retrieve_private_key(keystore)
 
@@ -423,6 +432,12 @@ def call(
     contract_address,
     compiled_contracts_path,
 ):
+    """
+    Calls to a contract CONTRACT_NAME calling function FUNCTION_NAME with arguments ARGS.
+
+    If the function takes array as arguments, they should be provided without brackets separated by commas.
+    For example int[] could be 123,456,789
+    """
     web3 = connect_to_json_rpc(jsonrpc)
 
     compiled_contracts = get_compiled_contracts(
