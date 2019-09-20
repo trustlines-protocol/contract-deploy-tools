@@ -6,6 +6,11 @@ Change Log
 -------------------------------
 
 
+`0.5.2`_ (2019-09-20)
+-------------------------------
+* Add  ``initcode`` command that gives the initcode for a contract
+* Improve parsing of function / constructor arguments from command line inputs
+
 `0.5.1`_ (2019-08-19)
 -------------------------------
 * Add the  ``--optimize-runs`` option to the ``compile`` command
@@ -83,4 +88,5 @@ Change Log
 .. _0.4.4: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.4.3...0.4.4
 .. _0.5.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.4.4...0.5.0
 .. _0.5.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.0...0.5.1
+.. _0.5.2: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.1...0.5.2
 .. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.1...master
