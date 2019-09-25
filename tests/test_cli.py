@@ -254,7 +254,7 @@ def test_deploy_keystore_wrong_nonce(runner, keystore_file_path, key_password):
 
 
 @pytest.mark.usefixtures("go_to_root_dir")
-def test_initcode_simple_contract(runner, key_password):
+def test_initcode_simple_contract(runner):
     result = runner.invoke(main, f"initcode OtherContract -d testcontracts")
     print(result.output)
     assert result.exit_code == 0

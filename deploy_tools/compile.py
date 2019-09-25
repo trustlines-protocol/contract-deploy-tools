@@ -4,8 +4,9 @@ from typing import List, Dict, Any
 
 from solc import compile_standard
 from eth_utils import add_0x_prefix
-
+from web3._utils.abi import get_constructor_abi
 from .files import find_files
+from web3._utils.contracts import encode_abi
 
 DEFAULT_OUTPUT_SELECTION = [
     "abi",
@@ -167,6 +168,21 @@ def compile_contract(
         file_paths=file_paths, allow_paths=[contracts_path], optimize=optimize
     )
     return compiled_contracts[name]
+
+
+def build_initcode(*, contract_bytecode, contract_abi=[], constructor_args=[]):
+    constructor_abi = get_constructor_abi(contract_abi)
+
+    # The initcode is the bytecode with the encoded arguments appended
+    if constructor_abi:
+        return encode_abi(
+            web3=None,
+            abi=constructor_abi,
+            arguments=constructor_args,
+            data=contract_bytecode,
+        )
+    else:
+        return contract_bytecode
 
 
 class UnknownContractException(Exception):
