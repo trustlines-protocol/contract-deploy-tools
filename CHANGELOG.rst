@@ -5,6 +5,9 @@ Change Log
 `unreleased`_
 -------------------------------
 
+`0.5.3`_ (2019-09-25)
+-------------------------------
+* Add ``build_initcode`` function that gives the initcode from a contract abi, bytecode, and constructor args
 
 `0.5.2`_ (2019-09-20)
 -------------------------------
@@ -89,4 +92,5 @@ Change Log
 .. _0.5.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.4.4...0.5.0
 .. _0.5.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.0...0.5.1
 .. _0.5.2: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.1...0.5.2
+.. _0.5.3: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.2...0.5.3
 .. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.1...master

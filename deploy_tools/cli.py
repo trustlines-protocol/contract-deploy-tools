@@ -23,9 +23,13 @@ from .deploy import (
     deploy_compiled_contract,
     send_function_call_transaction,
 )
-from .compile import filter_contracts, UnknownContractException, compile_project
+from .compile import (
+    filter_contracts,
+    UnknownContractException,
+    compile_project,
+    build_initcode,
+)
 
-from web3._utils.contracts import encode_abi
 
 # we need test_provider and test_json_rpc for running the tests in test_cli
 # they need to persist between multiple calls to runner.invoke and are
@@ -333,16 +337,11 @@ def initcode(
 
     abi = compiled_contracts[contract_name]["abi"]
     bytecode = compiled_contracts[contract_name]["bytecode"]
-    constructor_abi = get_constructor_abi(abi)
 
-    # The initcode is the bytecode with the encoded arguments appended
-    if constructor_abi:
-        arguments = parse_args_to_matching_types_for_constructor(args, abi)
-        initcode = encode_abi(
-            web3=None, abi=constructor_abi, arguments=arguments, data=bytecode
-        )
-    else:
-        initcode = bytecode
+    arguments = parse_args_to_matching_types_for_constructor(args, abi)
+    initcode = build_initcode(
+        contract_abi=abi, contract_bytecode=bytecode, constructor_args=arguments
+    )
 
     click.echo(initcode)
 
