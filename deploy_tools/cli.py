@@ -117,7 +117,7 @@ evm_version_option = click.option(
     help="The evm target version, one of: "
     "petersburg, constantinople, byzantium, spuriousDragon, tangerineWhistle, or homestead",
     show_default=True,
-    default="byzantium",
+    default="petersburg",
     envvar="EVM_VERSION",
 )
 compiled_contracts_path_option = click.option(

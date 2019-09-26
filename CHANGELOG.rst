@@ -5,6 +5,10 @@ Change Log
 `unreleased`_
 -------------------------------
 
+`0.6.0`_ (2019-09-26)
+-------------------------------
+* Change default evm target version of cli command ``compile`` to ``petersburg`` to match with the default of ``compile.compile_project`` (BREAKING)
+
 `0.5.3`_ (2019-09-25)
 -------------------------------
 * Add ``build_initcode`` function that gives the initcode from a contract abi, bytecode, and constructor args
@@ -93,4 +97,5 @@ Change Log
 .. _0.5.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.0...0.5.1
 .. _0.5.2: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.1...0.5.2
 .. _0.5.3: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.2...0.5.3
+.. _0.6.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.3...0.6.0
 .. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.1...master
