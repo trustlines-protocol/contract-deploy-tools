@@ -28,6 +28,7 @@ from .compile import (
     UnknownContractException,
     compile_project,
     build_initcode,
+    DEFAULT_EVM_VERSION,
 )
 
 
@@ -116,8 +117,8 @@ evm_version_option = click.option(
     type=str,
     help="The evm target version, one of: "
     "petersburg, constantinople, byzantium, spuriousDragon, tangerineWhistle, or homestead",
+    default=DEFAULT_EVM_VERSION,
     show_default=True,
-    default="petersburg",
     envvar="EVM_VERSION",
 )
 compiled_contracts_path_option = click.option(

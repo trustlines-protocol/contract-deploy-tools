@@ -13,6 +13,7 @@ from web3.providers.eth_tester import EthereumTesterProvider
 
 
 from deploy_tools import compile_project, deploy_compiled_contract
+from deploy_tools.compile import DEFAULT_EVM_VERSION
 
 
 CONTRACTS_FOLDER_OPTION = "--contracts-dir"
@@ -27,8 +28,12 @@ EVM_VERSION_OPTION_HELP = (
 def pytest_addoption(parser):
     parser.addoption(CONTRACTS_FOLDER_OPTION, help=CONTRACTS_FOLDER_OPTION_HELP)
     parser.addini(CONTRACTS_FOLDER_OPTION, CONTRACTS_FOLDER_OPTION_HELP)
-    parser.addoption(EVM_VERSION_OPTION, help=EVM_VERSION_OPTION_HELP)
-    parser.addini(EVM_VERSION_OPTION, EVM_VERSION_OPTION_HELP)
+    parser.addoption(
+        EVM_VERSION_OPTION, help=EVM_VERSION_OPTION_HELP, default=DEFAULT_EVM_VERSION
+    )
+    parser.addini(
+        EVM_VERSION_OPTION, EVM_VERSION_OPTION_HELP, default=DEFAULT_EVM_VERSION
+    )
 
 
 def get_contracts_folder(pytestconfig):
@@ -38,9 +43,7 @@ def get_contracts_folder(pytestconfig):
 
 
 def get_evm_version(pytestconfig):
-    if pytestconfig.getoption(EVM_VERSION_OPTION, default=None):
-        return pytestconfig.getoption(EVM_VERSION_OPTION)
-    return "byzantium"
+    return pytestconfig.getoption(EVM_VERSION_OPTION)
 
 
 @pytest.fixture(scope="session", autouse=True)

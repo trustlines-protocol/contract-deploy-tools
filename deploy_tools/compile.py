@@ -19,6 +19,8 @@ DEFAULT_OUTPUT_SELECTION = [
 
 ABI_OUTPUT_SELECTION = ["abi", "userdoc"]
 
+DEFAULT_EVM_VERSION = "petersburg"
+
 
 def load_sources(file_paths: List[str]):
     result = {}
@@ -89,7 +91,7 @@ def compile_project(
     optimize=True,
     optimize_runs=500,
     only_abi=False,
-    evm_version: str = "petersburg",
+    evm_version: str = DEFAULT_EVM_VERSION,
 ):
     """
     Compiles all contracts of the project into a single output
@@ -104,7 +106,6 @@ def compile_project(
         evm_version: target evm version to use for generated code
 
     Returns: A dictionary containing the compiled assets of the contracts
-
     """
 
     if file_paths is None:
