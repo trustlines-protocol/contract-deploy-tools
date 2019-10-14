@@ -5,6 +5,10 @@ Change Log
 `unreleased`_
 -------------------------------
 
+`0.6.1`_ (2019-10-14)
+-------------------------------
+* Set the ``from`` address field of a ``eth_sendTransaction`` RPC to the unlocked account of the Ethereum node
+
 `0.6.0`_ (2019-09-26)
 -------------------------------
 * Change default evm target version of cli command ``compile`` to ``petersburg`` to match with the default of ``compile.compile_project`` (BREAKING)
@@ -98,4 +102,5 @@ Change Log
 .. _0.5.2: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.1...0.5.2
 .. _0.5.3: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.2...0.5.3
 .. _0.6.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.3...0.6.0
-.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.1...master
+.. _0.6.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.6.0...0.6.1
+.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.6.1...master
