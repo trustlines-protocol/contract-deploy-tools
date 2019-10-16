@@ -488,7 +488,11 @@ def generate_keystore(keystore_path: str, private_key: str):
 
 
 def get_compiled_contracts(
-    *, contracts_dir, optimize=False, evm_version="byzantium", compiled_contracts_path
+    *,
+    contracts_dir,
+    optimize=False,
+    evm_version=DEFAULT_EVM_VERSION,
+    compiled_contracts_path,
 ):
     if contracts_dir is not None and compiled_contracts_path is not None:
         raise click.BadOptionUsage(
