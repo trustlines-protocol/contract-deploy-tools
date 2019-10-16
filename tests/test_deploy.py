@@ -6,6 +6,7 @@ from deploy_tools.deploy import (
     deploy_compiled_contract,
     send_function_call_transaction,
     TransactionFailed,
+    send_transaction,
 )
 from deploy_tools.plugin import get_contracts_folder
 from deploy_tools.compile import compile_project
@@ -134,3 +135,22 @@ def test_wait_for_successful_tx_receipt(test_contract, web3, account_keys):
             web3=web3,
             private_key=account_keys[2],
         )
+
+
+@pytest.mark.parametrize("use_private_key", [True, False])
+def test_send_eth_default_account(web3, accounts, account_keys, use_private_key):
+    pre_balance_0 = web3.eth.getBalance(accounts[0])
+    pre_balance_1 = web3.eth.getBalance(accounts[1])
+    value = 123
+    transaction_option = {"value": value, "to": accounts[1], "gasPrice": 0}
+    send_transaction(
+        web3=web3,
+        transaction_options=transaction_option,
+        private_key=account_keys[0] if use_private_key else None,
+    )
+
+    post_balance_0 = web3.eth.getBalance(accounts[0])
+    post_balance_1 = web3.eth.getBalance(accounts[1])
+
+    assert post_balance_0 - pre_balance_0 == -value
+    assert post_balance_1 - pre_balance_1 == value
