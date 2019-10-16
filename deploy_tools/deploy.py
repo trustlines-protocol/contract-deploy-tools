@@ -6,7 +6,7 @@ from eth_keyfile import extract_key_from_keyfile
 from web3.contract import Contract
 from web3 import Web3
 from web3.eth import Account
-from web3._utils.transactions import fill_nonce
+from web3._utils.transactions import fill_nonce, fill_transaction_defaults
 
 
 def deploy_compiled_contract(
@@ -48,7 +48,6 @@ def send_function_call_transaction(
     It will block until the transaction was successfully mined.
 
     Returns: The transaction receipt
-
     """
     if transaction_options is None:
         transaction_options = {}
@@ -69,6 +68,40 @@ def send_function_call_transaction(
         tx_hash = function_call.transact(transaction_options)
 
     return wait_for_successful_transaction_receipt(web3, tx_hash)
+
+
+def send_transaction(*, web3: Web3, transaction_options: Dict, private_key=None):
+    """
+    Send the transaction with given transaction options
+    Will either use an account of the node(default), or a local private key(if given) to sign the transaction.
+    It will block until the transaction was successfully mined.
+
+    Returns: The transaction receipt
+    """
+
+    if private_key is not None:
+        account = Account.from_key(private_key)
+
+        if (
+            "from" in transaction_options
+            and transaction_options["from"] != account.address
+        ):
+            raise ValueError(
+                "From can not be set in transaction_options if a private key is used"
+            )
+        transaction_options["from"] = account.address
+
+        transaction = fill_nonce(web3, transaction_options)
+        transaction = fill_transaction_defaults(web3, transaction)
+        signed_transaction = account.sign_transaction(transaction)
+        tx_hash = web3.eth.sendRawTransaction(signed_transaction.rawTransaction)
+
+    else:
+        tx_hash = web3.eth.sendTransaction(transaction_options)
+
+    receipt = wait_for_successful_transaction_receipt(web3, tx_hash)
+
+    return receipt
 
 
 class TransactionFailed(Exception):

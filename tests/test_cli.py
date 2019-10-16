@@ -576,3 +576,10 @@ def test_parse_argument_to_matching_type(arg, type, expected_return):
 def test_parse_argument_not_supported_yet(arg, type):
     with pytest.raises(ValueError, match="Cannot handle parameter of type"):
         parse_arg_to_matching_type(arg, type)
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_send_eth(runner, accounts):
+    result = runner.invoke(main, (f"send-eth --jsonrpc test 123 {accounts[1]}"))
+
+    assert result.exit_code == 0

@@ -21,6 +21,7 @@ from .deploy import (
     decrypt_private_key,
     build_transaction_options,
     deploy_compiled_contract,
+    send_transaction,
     send_function_call_transaction,
 )
 from .compile import (
@@ -415,7 +416,7 @@ def transact(
     click.echo(encode_hex(receipt.transactionHash))
 
 
-@main.command(short_help="Calls a contract function")
+@main.command(short_help="Calls a contract function.")
 @click.argument("contract-name", type=str)
 @click.argument("function-name", type=str)
 @click.argument("args", nargs=-1, type=str)
@@ -485,6 +486,47 @@ def generate_keystore(keystore_path: str, private_key: str):
         file.close()
 
     click.echo(f"Stored keystore for {account.address} at {keystore_path}")
+
+
+@main.command(short_help="Send ether to the given address.")
+@click.argument("value", type=int)
+@click.argument("address", type=str)
+@jsonrpc_option
+@gas_option
+@gas_price_option
+@nonce_option
+@auto_nonce_option
+@keystore_option
+def send_eth(
+    gas: int,
+    gas_price: int,
+    nonce: int,
+    auto_nonce: bool,
+    keystore: str,
+    jsonrpc: str,
+    address: str,
+    value: int,
+):
+    """
+    Send a transaction with VALUE wei to address ADDRESS
+    """
+    web3 = connect_to_json_rpc(jsonrpc)
+    private_key = retrieve_private_key(keystore)
+
+    nonce = get_nonce(
+        web3=web3, nonce=nonce, auto_nonce=auto_nonce, private_key=private_key
+    )
+    transaction_options = build_transaction_options(
+        gas=gas, gas_price=gas_price, nonce=nonce, value=value
+    )
+
+    transaction_options["to"] = address
+
+    receipt = send_transaction(
+        web3=web3, transaction_options=transaction_options, private_key=private_key
+    )
+
+    click.echo(encode_hex(receipt["transactionHash"]))
 
 
 def get_compiled_contracts(
