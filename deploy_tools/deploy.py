@@ -97,6 +97,9 @@ def send_transaction(*, web3: Web3, transaction_options: Dict, private_key=None)
         tx_hash = web3.eth.sendRawTransaction(signed_transaction.rawTransaction)
 
     else:
+        if "from" not in transaction_options:
+            transaction_options["from"] = web3.eth.accounts[0]
+
         tx_hash = web3.eth.sendTransaction(transaction_options)
 
     receipt = wait_for_successful_transaction_receipt(web3, tx_hash)
