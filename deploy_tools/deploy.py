@@ -62,6 +62,8 @@ def send_function_call_transaction(
         tx_hash = web3.eth.sendRawTransaction(signed_transaction.rawTransaction)
 
     else:
+        # transact() will not fill the from field by asking the node
+        # we need to ask it ourselves with web3.eth.accounts[0]
         if "from" not in transaction_options:
             transaction_options["from"] = web3.eth.accounts[0]
 
@@ -97,6 +99,8 @@ def send_transaction(*, web3: Web3, transaction_options: Dict, private_key=None)
         tx_hash = web3.eth.sendRawTransaction(signed_transaction.rawTransaction)
 
     else:
+        # web3.eth.sendTransaction() will not fill the from field by asking the node
+        # we need to ask it ourselves with web3.eth.accounts[0]
         if "from" not in transaction_options:
             transaction_options["from"] = web3.eth.accounts[0]
 
