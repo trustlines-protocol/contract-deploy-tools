@@ -4,7 +4,8 @@ setup(
     name="contract-deploy-tools",
     setup_requires=["setuptools_scm"],
     use_scm_version=True,
-    packages=find_packages(),
+    packages=find_packages("src"),
+    package_dir={"": "src"},
     install_requires=[
         "py-solc",
         "web3>=5.0.0b2",

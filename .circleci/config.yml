@@ -69,7 +69,7 @@ jobs:
       - run:
           name: Run flake8
           command: |
-            flake8 deploy_tools tests
+            flake8 src tests
 
   run-black:
     executor: ubuntu-builder
@@ -81,7 +81,7 @@ jobs:
       - run:
           name: Run black
           command: |
-            black --check deploy_tools tests setup.py
+            black --check src tests setup.py
 
   run-pytest:
     executor: ubuntu-builder
@@ -103,7 +103,7 @@ jobs:
       - run:
           name: Run mypy
           command: |
-            mypy --ignore-missing-imports deploy_tools tests
+            mypy --ignore-missing-imports src tests
 
 
   build-sdist:
