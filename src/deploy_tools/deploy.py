@@ -39,6 +39,16 @@ def deploy_compiled_contract(
     return contract(address)
 
 
+def _set_from_address(web3, transaction_options):
+    """set the from address in the transaction options
+
+    transact() will not fill the from field by asking the node
+    we need to do that ourselves
+    """
+    if "from" not in transaction_options:
+        transaction_options["from"] = web3.eth.defaultAccount or web3.eth.accounts[0]
+
+
 def send_function_call_transaction(
     function_call, *, web3: Web3, transaction_options: Dict = None, private_key=None
 ):
@@ -62,10 +72,7 @@ def send_function_call_transaction(
         tx_hash = web3.eth.sendRawTransaction(signed_transaction.rawTransaction)
 
     else:
-        # transact() will not fill the from field by asking the node
-        # we need to ask it ourselves with web3.eth.accounts[0]
-        if "from" not in transaction_options:
-            transaction_options["from"] = web3.eth.accounts[0]
+        _set_from_address(web3, transaction_options)
 
         tx_hash = function_call.transact(transaction_options)
 
@@ -99,11 +106,7 @@ def send_transaction(*, web3: Web3, transaction_options: Dict, private_key=None)
         tx_hash = web3.eth.sendRawTransaction(signed_transaction.rawTransaction)
 
     else:
-        # web3.eth.sendTransaction() will not fill the from field by asking the node
-        # we need to ask it ourselves with web3.eth.accounts[0]
-        if "from" not in transaction_options:
-            transaction_options["from"] = web3.eth.accounts[0]
-
+        _set_from_address(web3, transaction_options)
         tx_hash = web3.eth.sendTransaction(transaction_options)
 
     receipt = wait_for_successful_transaction_receipt(web3, tx_hash)
