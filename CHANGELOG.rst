@@ -2,8 +2,10 @@
 Change Log
 ==========
 
-`unreleased`_
+`0.7.1`_ (2020-01-24)
 -------------------------------
+* Prefer web3.eth.defaultAccount for signing transactions
+
 `0.7.0`_ (2019-11-04)
 -------------------------------
 * Add a send eth command to send eth on the command line
@@ -107,4 +109,4 @@ Change Log
 .. _0.6.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.5.3...0.6.0
 .. _0.6.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.6.0...0.6.1
 .. _0.7.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.6.1...0.7.0
-.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.0...master
+.. _0.7.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.0...0.7.1
