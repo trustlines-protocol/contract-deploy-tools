@@ -8,7 +8,7 @@ setup(
     package_dir={"": "src"},
     install_requires=[
         "py-solc",
-        "web3>=5.0.0b2",
+        "web3>=5.0.0,<5.2",
         "eth-tester[py-evm]",
         "eth-utils",
         "eth-keyfile",
