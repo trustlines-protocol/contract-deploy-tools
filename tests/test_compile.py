@@ -1,5 +1,6 @@
-from deploy_tools.compile import build_initcode
 from eth_utils import is_hex
+
+from deploy_tools.compile import build_initcode
 
 
 def test_build_initcode_no_constructor(web3, contract_assets):

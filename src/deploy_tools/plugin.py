@@ -1,20 +1,18 @@
 """Pytest plugins"""
-from pathlib import Path
-
-import os
 import io
+import os
 import shutil
 import subprocess
-import pytest
-import eth_tester
-from web3.contract import Contract
-from web3 import Web3
-from web3.providers.eth_tester import EthereumTesterProvider
+from pathlib import Path
 
+import eth_tester
+import pytest
+from web3 import Web3
+from web3.contract import Contract
+from web3.providers.eth_tester import EthereumTesterProvider
 
 from deploy_tools import compile_project, deploy_compiled_contract
 from deploy_tools.compile import DEFAULT_EVM_VERSION
-
 
 CONTRACTS_FOLDER_OPTION = "--contracts-dir"
 CONTRACTS_FOLDER_OPTION_HELP = "Folder which contains the project smart contracts"

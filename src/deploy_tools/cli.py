@@ -1,37 +1,36 @@
-from typing import Sequence, Optional
-from pathlib import Path
-from os import path
-
 import json
-import click
-from web3 import Web3, EthereumTesterProvider, Account
-from web3._utils.abi import get_constructor_abi, get_abi_input_types
-from eth_utils import encode_hex
-
-from .files import (
-    write_pretty_json_asset,
-    ensure_path_for_file_exists,
-    write_minified_json_asset,
-    validate_and_format_address,
-    InvalidAddressException,
-    load_json_asset,
-)
 import re
-from .deploy import (
-    decrypt_private_key,
-    build_transaction_options,
-    deploy_compiled_contract,
-    send_transaction,
-    send_function_call_transaction,
-)
-from .compile import (
-    filter_contracts,
-    UnknownContractException,
-    compile_project,
-    build_initcode,
-    DEFAULT_EVM_VERSION,
-)
+from os import path
+from pathlib import Path
+from typing import Optional, Sequence
 
+import click
+from eth_utils import encode_hex
+from web3 import Account, EthereumTesterProvider, Web3
+from web3._utils.abi import get_abi_input_types, get_constructor_abi
+
+from .compile import (
+    DEFAULT_EVM_VERSION,
+    UnknownContractException,
+    build_initcode,
+    compile_project,
+    filter_contracts,
+)
+from .deploy import (
+    build_transaction_options,
+    decrypt_private_key,
+    deploy_compiled_contract,
+    send_function_call_transaction,
+    send_transaction,
+)
+from .files import (
+    InvalidAddressException,
+    ensure_path_for_file_exists,
+    load_json_asset,
+    validate_and_format_address,
+    write_minified_json_asset,
+    write_pretty_json_asset,
+)
 
 # we need test_provider and test_json_rpc for running the tests in test_cli
 # they need to persist between multiple calls to runner.invoke and are

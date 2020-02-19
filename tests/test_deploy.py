@@ -1,15 +1,15 @@
-import pytest
 import eth_utils
+import pytest
 from eth_utils import is_address
 
+from deploy_tools.compile import compile_project
 from deploy_tools.deploy import (
+    TransactionFailed,
     deploy_compiled_contract,
     send_function_call_transaction,
-    TransactionFailed,
     send_transaction,
 )
 from deploy_tools.plugin import get_contracts_folder
-from deploy_tools.compile import compile_project
 
 
 @pytest.fixture()

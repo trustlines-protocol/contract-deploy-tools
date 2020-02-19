@@ -1,8 +1,9 @@
-import pytest
 import csv
 
+import pytest
 from eth_utils import to_checksum_address
-from deploy_tools.files import read_addresses_in_csv, InvalidAddressException
+
+from deploy_tools.files import InvalidAddressException, read_addresses_in_csv
 
 
 @pytest.fixture()

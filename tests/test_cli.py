@@ -1,11 +1,11 @@
+import json
 import os
 from pathlib import Path
-import json
 
 import pytest
 from click.testing import CliRunner
 from eth_keyfile import create_keyfile_json
-from eth_utils import is_address, is_hex, is_0x_prefixed
+from eth_utils import is_0x_prefixed, is_address, is_hex
 from eth_utils.exceptions import ValidationError
 
 from deploy_tools.cli import main, parse_arg_to_matching_type

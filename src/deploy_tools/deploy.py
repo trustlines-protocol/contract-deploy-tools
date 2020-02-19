@@ -1,12 +1,12 @@
-from typing import Dict
-import pkg_resources
 import json
+from typing import Dict
 
+import pkg_resources
 from eth_keyfile import extract_key_from_keyfile
-from web3.contract import Contract
 from web3 import Web3
-from web3.eth import Account
 from web3._utils.transactions import fill_nonce, fill_transaction_defaults
+from web3.contract import Contract
+from web3.eth import Account
 
 
 def deploy_compiled_contract(
