@@ -40,14 +40,15 @@ jobs:
       - checkout
       - config-path
       - restore_cache:
-          key: venv-{{ checksum "constraints.txt" }}-{{ checksum "requirements.txt" }}
+          key: venv-{{ checksum "constraints.txt" }}-{{ checksum "setup.cfg" }}
       - create-venv
       - run:
           name: Install requirements
           command: |
-            pip install -c constraints.txt -r requirements.txt
+            pip install -c constraints.txt -e .[dev]
+            pip uninstall -y contract-deploy-tools
       - save_cache:
-          key: venv-{{ checksum "constraints.txt" }}-{{ checksum "requirements.txt" }}
+          key: venv-{{ checksum "constraints.txt" }}-{{ checksum "setup.cfg" }}
           paths:
             - venv
       - run:
