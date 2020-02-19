@@ -8,7 +8,7 @@ repos:
     - id: black
 
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.2.3
+    rev: v2.5.0
     hooks:
     - id: check-added-large-files
     - id: check-ast
@@ -31,3 +31,9 @@ repos:
     -   id: mypy
         args:
         - --ignore-missing-imports
+
+- repo: https://github.com/pre-commit/mirrors-isort
+  rev: v4.3.21
+  hooks:
+    - id: isort
+      args: ["--ignore-whitespace", "--settings-path", "./", "--recursive"]
