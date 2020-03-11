@@ -2,6 +2,10 @@
 Change Log
 ==========
 
+`0.7.2`_ (2020-03-11)
+-------------------------------
+* Limit web3 dependency to <5.2 because of incompatibility.
+
 `0.7.1`_ (2020-01-24)
 -------------------------------
 * Prefer web3.eth.defaultAccount for signing transactions
@@ -110,3 +114,4 @@ Change Log
 .. _0.6.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.6.0...0.6.1
 .. _0.7.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.6.1...0.7.0
 .. _0.7.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.0...0.7.1
+.. _0.7.2: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.1...0.7.2
