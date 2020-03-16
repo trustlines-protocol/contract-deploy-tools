@@ -3,10 +3,12 @@ from typing import Dict
 
 import pkg_resources
 from eth_keyfile import extract_key_from_keyfile
+from hexbytes import HexBytes
 from web3 import Web3
 from web3._utils.transactions import fill_nonce, fill_transaction_defaults
 from web3.contract import Contract
 from web3.eth import Account
+from web3.types import TxParams, TxReceipt
 
 
 def deploy_compiled_contract(
@@ -79,7 +81,7 @@ def send_function_call_transaction(
     return wait_for_successful_transaction_receipt(web3, tx_hash)
 
 
-def send_transaction(*, web3: Web3, transaction_options: Dict, private_key=None):
+def send_transaction(*, web3: Web3, transaction_options: TxParams, private_key=None):
     """
     Send the transaction with given transaction options
     Will either use an account of the node(default), or a local private key(if given) to sign the transaction.
@@ -118,7 +120,9 @@ class TransactionFailed(Exception):
     pass
 
 
-def wait_for_successful_transaction_receipt(web3: Web3, txid: str, timeout=180) -> dict:
+def wait_for_successful_transaction_receipt(
+    web3: Web3, txid: HexBytes, timeout=180
+) -> TxReceipt:
     """See if transaction went through (Solidity code did not throw).
     :return: Transaction receipt
     """
