@@ -10,7 +10,7 @@ certifi==2019.6.16
 cfgv==2.0.1
 chardet==3.0.4
 Click==7.0
-cytoolz==0.10.0
+cytoolz==0.10.1
 entrypoints==0.3
 eth-abi==2.0.0
 eth-account==0.4.0
@@ -20,8 +20,8 @@ eth-keyfile==0.5.1
 eth-keys==0.2.4
 eth-rlp==0.1.2
 eth-tester==0.2.0b2
-eth-typing==2.1.0
-eth-utils==1.6.2
+eth-typing==2.2.1
+eth-utils==1.8.4
 flake8==3.7.8
 hexbytes==0.2.0
 identify==1.4.5
@@ -29,7 +29,7 @@ idna==2.8
 importlib-metadata==0.19
 importlib-resources==1.0.2
 ipfshttpclient==0.4.12
-jsonschema==2.6.0
+jsonschema==3.0.0
 lru-dict==1.1.6
 mccabe==0.6.1
 more-itertools==7.2.0
@@ -44,7 +44,7 @@ pip==19.2.1
 pkg-resources==0.0.0
 pluggy==0.12.0
 pre-commit==1.18.0
-protobuf==3.9.0
+protobuf==3.10.0
 py==1.8.0
 py-ecc==1.7.1
 py-evm==0.3.0a1
@@ -67,12 +67,12 @@ toml==0.10.0
 toolz==0.10.0
 trie==1.4.0
 typed-ast==1.4.0
-typing-extensions==3.7.4
+typing-extensions==3.7.4.1
 urllib3==1.25.3
 varint==1.0.2
 virtualenv==16.7.2
 wcwidth==0.1.7
-web3==5.0.0
-websockets==7.0
+web3==5.6.0
+websockets==8.1.0
 wheel==0.33.4
 zipp==0.5.2
