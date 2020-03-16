@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 
 from eth_utils import add_0x_prefix
 from solc import compile_standard
+from web3 import Web3
 from web3._utils.abi import get_constructor_abi
 from web3._utils.contracts import encode_abi
 
@@ -178,7 +179,7 @@ def build_initcode(*, contract_bytecode, contract_abi=[], constructor_args=[]):
     # The initcode is the bytecode with the encoded arguments appended
     if constructor_abi:
         return encode_abi(
-            web3=None,
+            web3=Web3(),
             abi=constructor_abi,
             arguments=constructor_args,
             data=contract_bytecode,
