@@ -1,0 +1,9 @@
+flake8
+mypy
+pytest
+setuptools_scm
+pip>=18.1
+wheel
+setuptools
+black
+pre-commit
