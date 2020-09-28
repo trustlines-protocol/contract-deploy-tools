@@ -7,6 +7,8 @@ from pathlib import Path
 
 import eth_tester
 import pytest
+from eth_tester_rpc.server import get_application
+from eth_tester_rpc.utils.compat_threading import make_server, spawn
 from web3 import Web3
 from web3.contract import Contract
 from web3.providers.eth_tester import EthereumTesterProvider
@@ -21,6 +23,10 @@ EVM_VERSION_OPTION_HELP = (
     "The evm target version one of: "
     "petersburg, constantinople, byzantium, spuriousDragon, tangerineWhistle, or homestead"
 )
+EXPOSE_RPC_OPTION = "--expose-rpc"
+EXPOSE_RPC_OPTION_HELP = (
+    "Ports on which you want to expose the web3 rpc of the test chain."
+)
 
 
 def pytest_addoption(parser):
@@ -32,6 +38,8 @@ def pytest_addoption(parser):
     parser.addini(
         EVM_VERSION_OPTION, EVM_VERSION_OPTION_HELP, default=DEFAULT_EVM_VERSION
     )
+    parser.addoption(EXPOSE_RPC_OPTION, help=EXPOSE_RPC_OPTION_HELP)
+    parser.addini(EXPOSE_RPC_OPTION, EXPOSE_RPC_OPTION_HELP, default=None)
 
 
 def get_contracts_folder(pytestconfig):
@@ -101,11 +109,30 @@ def deploy_contract(web3, contract_assets):
 
 
 @pytest.fixture(scope="session")
-def chain():
+def chain(pytestconfig):
     """
     The running ethereum tester chain
+    Can be used as to manipulate the chain, e.g. chain.mine_block()
+    see https://github.com/ethereum/eth-tester for more
     """
-    return eth_tester.EthereumTester(eth_tester.PyEVMBackend())
+    expose_port = pytestconfig.getoption(EXPOSE_RPC_OPTION)
+    if expose_port:
+        # Get the eth-tester-rpc application
+        application = get_application()
+        # Start the server so that we can use rpc on http://localhost:expose_port
+        server = make_server("localhost", int(expose_port), application,)
+        spawn(server.serve_forever)
+
+        # yield the eth_tester chain
+        yield application.rpc_methods.client
+    else:
+        yield eth_tester.EthereumTester(eth_tester.PyEVMBackend())
+
+    if pytestconfig.getoption(EXPOSE_RPC_OPTION):
+        try:
+            server.stop()
+        except AttributeError:
+            server.shutdown()
 
 
 @pytest.fixture(scope="session")
