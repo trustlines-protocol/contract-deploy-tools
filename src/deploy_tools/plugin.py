@@ -2,8 +2,12 @@
 import io
 import os
 import shutil
+import socket
 import subprocess
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
+from wsgiref.simple_server import WSGIRequestHandler
 
 import eth_tester
 import pytest
@@ -108,6 +112,21 @@ def deploy_contract(web3, contract_assets):
     return deploy_contract_function
 
 
+class NullIO(StringIO):
+    def write(self, txt):
+        pass
+
+
+def silent_stdout(fn):
+    """Decorator to silence functions so that they will not print anything."""
+
+    def silent_fn(*args, **kwargs):
+        with redirect_stdout(NullIO()):
+            return fn(*args, **kwargs)
+
+    return silent_fn
+
+
 @pytest.fixture(scope="session")
 def chain(pytestconfig):
     """
@@ -117,10 +136,31 @@ def chain(pytestconfig):
     """
     expose_port = pytestconfig.getoption(EXPOSE_RPC_OPTION)
     if expose_port:
+        if is_port_in_use(expose_port):
+            raise EnvironmentError(
+                f"The port {expose_port} is already in use on the machine."
+            )
+        # redirect stdout because otherwise the application prints every request and result
         # Get the eth-tester-rpc application
         application = get_application()
+        rpc = application.rpc_methods
+
+        # Remove the printing of every rpc replies to avoid flooding the tests outputs
+        application = silent_stdout(application)
+        application.rpc_methods = rpc
+
         # Start the server so that we can use rpc on http://localhost:expose_port
-        server = make_server("localhost", int(expose_port), application,)
+        # Silence the logging of every request from the handler to avoid flooding tests outputs
+        class NoLoggingRequestHandler(WSGIRequestHandler):
+            def log_request(self, code="-", size="-"):
+                pass
+
+        server = make_server(
+            "localhost",
+            int(expose_port),
+            application,
+            handler_class=NoLoggingRequestHandler,
+        )
         spawn(server.serve_forever)
 
         # yield the eth_tester chain
@@ -133,6 +173,11 @@ def chain(pytestconfig):
             server.stop()
         except AttributeError:
             server.shutdown()
+
+
+def is_port_in_use(port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(("localhost", int(port))) == 0
 
 
 @pytest.fixture(scope="session")
