@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+`0.8.0`_ (2020-10-08)
+-------------------------------
+* Update web3 dependency to 5.7.0
+* Add option `--expose-rpc=port` for pytest plugin to expose the rpc of the test chain on localhost:port.
+
 `0.7.2`_ (2020-03-11)
 -------------------------------
 * Limit web3 dependency to <5.2 because of incompatibility.
@@ -115,3 +120,4 @@ Change Log
 .. _0.7.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.6.1...0.7.0
 .. _0.7.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.0...0.7.1
 .. _0.7.2: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.1...0.7.2
+.. _0.8.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.2...0.8.0
