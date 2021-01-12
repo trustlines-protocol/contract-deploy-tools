@@ -16,13 +16,7 @@ from .compile import (
     compile_project,
     filter_contracts,
 )
-from .deploy import (
-    build_transaction_options,
-    decrypt_private_key,
-    deploy_compiled_contract,
-    send_function_call_transaction,
-    send_transaction,
-)
+from .deploy import decrypt_private_key, deploy_compiled_contract
 from .files import (
     InvalidAddressException,
     ensure_path_for_file_exists,
@@ -30,6 +24,11 @@ from .files import (
     validate_and_format_address,
     write_minified_json_asset,
     write_pretty_json_asset,
+)
+from .transact import (
+    build_transaction_options,
+    wait_for_successful_function_call,
+    wait_for_successful_transaction,
 )
 
 # we need test_provider and test_json_rpc for running the tests in test_cli
@@ -137,7 +136,7 @@ contract_address_option = click.option(
 )
 keystore_file_save_option = click.option(
     "--keystore-path",
-    help=f"Path where to store the keystore file",
+    help="Path where to store the keystore file",
     type=click.Path(resolve_path=True),
     default=KEYSTORE_FILE_SAVE_DEFAULT,
     show_default=True,
@@ -405,7 +404,7 @@ def transact(
     parsed_arguments = parse_args_to_matching_types_for_function(args, function_abi)
     function_call = contract.functions[function_name](*parsed_arguments)
 
-    receipt = send_function_call_transaction(
+    receipt = wait_for_successful_function_call(
         function_call,
         web3=web3,
         transaction_options=transaction_options,
@@ -521,7 +520,7 @@ def send_eth(
 
     transaction_options["to"] = address
 
-    receipt = send_transaction(
+    receipt = wait_for_successful_transaction(
         web3=web3, transaction_options=transaction_options, private_key=private_key
     )
 
@@ -538,7 +537,7 @@ def get_compiled_contracts(
     if contracts_dir is not None and compiled_contracts_path is not None:
         raise click.BadOptionUsage(
             "--contracts-dir, --compiled-contracts",
-            f"Both --contracts-dir and --compiled-contracts were specified. Please only use one of the two.",
+            "Both --contracts-dir and --compiled-contracts were specified. Please only use one of the two.",
         )
     if compiled_contracts_path is not None:
         return load_json_asset(compiled_contracts_path)
