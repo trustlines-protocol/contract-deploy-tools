@@ -17,5 +17,4 @@ contract ManyArgumentsContract {
         e = _e;
         f = _f;
     }
-
 }

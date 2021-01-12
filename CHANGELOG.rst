@@ -1,6 +1,16 @@
 ==========
 Change Log
 ==========
+`0.9.0`_ (2020-01-13)
+-------------------------------
+* Changed: Move transaction sending related functions from `deploy.py` to `transact.py`:
+  `send_function_call_transaction`, `send_transaction`, `build_transaction_options`,
+  `increase_transaction_options_nonce`, and `wait_for_successful_transaction_receipt`.
+* Changed: Repurposed `send_function_call_transaction` to no longer wait for the success of the sent transaction
+* Added: `wait_for_successful_function_call` that sends a function call and wait for its success
+* Changed: Repurposed `send_transaction` to no longer wait for the success of the sent transaction
+* Added: `wait_for_successful_transaction` that sends a transaction and wait for its success
+* Added: `wait_for_successful_transaction_receipts` to wait for a list of transaction ids to be successful
 
 `0.8.0`_ (2020-10-08)
 -------------------------------
@@ -121,3 +131,4 @@ Change Log
 .. _0.7.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.0...0.7.1
 .. _0.7.2: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.1...0.7.2
 .. _0.8.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.2...0.8.0
+.. _0.9.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.8.0...0.9.0
