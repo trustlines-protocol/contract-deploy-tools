@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.8.0;
 
 import './subfolder/OtherContract.sol';
 
@@ -6,7 +6,7 @@ contract TestContract {
 
     uint public state;
 
-    constructor(uint val) public {
+    constructor(uint val) {
         state = val;
     }
 
@@ -43,7 +43,10 @@ contract TestContract {
         return a;
     }
 
-    function failingFunction() public pure returns (bytes memory) {
+    function failingFunction() public pure {
         require(false, "This function can only fail.");
     }
 }
+
+
+// SPDX-License-Identifier: MIT
