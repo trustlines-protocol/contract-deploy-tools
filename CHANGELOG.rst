@@ -1,7 +1,7 @@
 ==========
 Change Log
 ==========
-`0.9.1`_ (2020-01-13)
+`0.9.1`_ (2020-01-26)
 -------------------------------
 * Updated: No longer fill nonce for user when no private key is used, leave that task to the blockchain node.
   This allows to send multiple transactions in parallel without having to worry about the nonce.
