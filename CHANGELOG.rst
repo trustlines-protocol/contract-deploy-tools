@@ -1,6 +1,11 @@
 ==========
 Change Log
 ==========
+`0.9.1`_ (2020-01-13)
+-------------------------------
+* Updated: No longer fill nonce for user when no private key is used, leave that task to the blockchain node.
+  This allows to send multiple transactions in parallel without having to worry about the nonce.
+
 `0.9.0`_ (2020-01-13)
 -------------------------------
 * Changed: Move transaction sending related functions from `deploy.py` to `transact.py`:
@@ -132,3 +137,4 @@ Change Log
 .. _0.7.2: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.1...0.7.2
 .. _0.8.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.2...0.8.0
 .. _0.9.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.8.0...0.9.0
+.. _0.9.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.9.0...0.9.1
