@@ -72,7 +72,7 @@ def send_function_call_transaction(
     """
     Creates, signs and sends a transaction from a function call (for example created with `contract.functions.foo()`.
     Will either use an account of the node(default), or a local private key(if given) to sign the transaction.
-    It will not block until tx is sent
+    It will not block to wait for the transaction to be succesful.
 
     Returns: The transaction hash
     """
@@ -90,7 +90,7 @@ def send_function_call_transaction(
 
     else:
         _set_from_address(web3, transaction_options)
-        fill_nonce(web3, transaction_options)
+
         tx_hash = function_call.transact(transaction_options)
 
     return tx_hash
