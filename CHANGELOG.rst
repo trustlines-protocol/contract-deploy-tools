@@ -1,6 +1,11 @@
 ==========
 Change Log
 ==========
+`unreleased`_
+-------------------------------
+* Updated: default key derivation function (kdf) for generate_keystore changed to `pbkdf2` to be compatible with
+  OpenEthereum. Use option `--kdf` to use custom kdf.
+
 `0.9.1`_ (2020-01-26)
 -------------------------------
 * Updated: No longer fill nonce for user when no private key is used, leave that task to the blockchain node.
@@ -138,3 +143,4 @@ Change Log
 .. _0.8.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.2...0.8.0
 .. _0.9.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.8.0...0.9.0
 .. _0.9.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.9.0...0.9.1
+.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.9.1...master

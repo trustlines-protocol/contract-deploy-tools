@@ -459,8 +459,19 @@ def call(
     short_help="Generates an encrypted keystore file. Creates a new account if no private key is provided."
 )
 @keystore_file_save_option
+@click.option(
+    "--kdf",
+    "key_derivation_function",
+    help="Key derivation function to be used for the keystore. "
+    "As of OpenEthereum 3.1, only pbkdf2 seems to be supported.",
+    type=str,
+    default="pbkdf2",
+    show_default=True,
+)
 @private_key_option
-def generate_keystore(keystore_path: str, private_key: str):
+def generate_keystore(
+    keystore_path: str, private_key: str, key_derivation_function: str
+):
     if path.exists(keystore_path):
         raise click.BadOptionUsage(  # type: ignore
             "--keystore-file", f"The file {keystore_path} does already exist!"
@@ -477,7 +488,7 @@ def generate_keystore(keystore_path: str, private_key: str):
         hide_input=True,
         confirmation_prompt=True,
     )
-    keystore = account.encrypt(password=password)
+    keystore = account.encrypt(password=password, kdf=key_derivation_function)
 
     with open(keystore_path, "w") as file:
         file.write(json.dumps(keystore))
