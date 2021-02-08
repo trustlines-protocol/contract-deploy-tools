@@ -80,14 +80,10 @@ gas_price_option = click.option(
     envvar="GAS_PRICE",
 )
 nonce_option = click.option(
-    "--nonce", help="Nonce of the first transaction to be sent", type=int, default=None
-)
-auto_nonce_option = click.option(
-    "--auto-nonce",
-    help="automatically determine the nonce of first transaction to be sent",
-    default=False,
-    is_flag=True,
-    envvar="AUTO_NONCE",
+    "--nonce",
+    help="Nonce of the first transaction to be sent, queried from the pending block if left out",
+    type=int,
+    default=None,
 )
 contracts_dir_option = click.option(
     "--contracts-dir",
@@ -236,7 +232,6 @@ def compile(
 @gas_option
 @gas_price_option
 @nonce_option
-@auto_nonce_option
 @keystore_option
 @jsonrpc_option
 @contracts_dir_option
@@ -249,7 +244,6 @@ def deploy(
     gas: int,
     gas_price: int,
     nonce: int,
-    auto_nonce: bool,
     keystore: str,
     jsonrpc: str,
     contracts_dir,
@@ -267,9 +261,7 @@ def deploy(
     web3 = connect_to_json_rpc(jsonrpc)
     private_key = retrieve_private_key(keystore)
 
-    nonce = get_nonce(
-        web3=web3, nonce=nonce, auto_nonce=auto_nonce, private_key=private_key
-    )
+    nonce = get_nonce(web3=web3, nonce=nonce, private_key=private_key)
     transaction_options = build_transaction_options(
         gas=gas, gas_price=gas_price, nonce=nonce
     )
@@ -353,7 +345,6 @@ def initcode(
 @gas_option
 @gas_price_option
 @nonce_option
-@auto_nonce_option
 @keystore_option
 @jsonrpc_option
 @contracts_dir_option
@@ -367,7 +358,6 @@ def transact(
     gas: int,
     gas_price: int,
     nonce: int,
-    auto_nonce: bool,
     keystore: str,
     jsonrpc: str,
     contracts_dir,
@@ -384,9 +374,7 @@ def transact(
     web3 = connect_to_json_rpc(jsonrpc)
     private_key = retrieve_private_key(keystore)
 
-    nonce = get_nonce(
-        web3=web3, nonce=nonce, auto_nonce=auto_nonce, private_key=private_key
-    )
+    nonce = get_nonce(web3=web3, nonce=nonce, private_key=private_key)
     transaction_options = build_transaction_options(
         gas=gas, gas_price=gas_price, nonce=nonce, value=value
     )
@@ -504,13 +492,11 @@ def generate_keystore(
 @gas_option
 @gas_price_option
 @nonce_option
-@auto_nonce_option
 @keystore_option
 def send_eth(
     gas: int,
     gas_price: int,
     nonce: int,
-    auto_nonce: bool,
     keystore: str,
     jsonrpc: str,
     address: str,
@@ -522,9 +508,7 @@ def send_eth(
     web3 = connect_to_json_rpc(jsonrpc)
     private_key = retrieve_private_key(keystore)
 
-    nonce = get_nonce(
-        web3=web3, nonce=nonce, auto_nonce=auto_nonce, private_key=private_key
-    )
+    nonce = get_nonce(web3=web3, nonce=nonce, private_key=private_key)
     transaction_options = build_transaction_options(
         gas=gas, gas_price=gas_price, nonce=nonce, value=value
     )
@@ -595,25 +579,19 @@ def retrieve_private_key(keystore_path):
     return private_key
 
 
-def get_nonce(*, web3: Web3, nonce: int, auto_nonce: bool, private_key: bytes):
+def get_nonce(*, web3: Web3, nonce: int, private_key: bytes):
     """get the nonce to be used as specified via command line options
-
-     we do some option checking in this function. It would be better to do this
-     before doing any real work, but we would need another function then.
     """
-    if auto_nonce and not private_key:
-        raise click.UsageError("--auto-nonce requires --keystore argument")
-    if nonce is not None and auto_nonce:
-        raise click.UsageError(
-            "--nonce and --auto-nonce cannot be used at the same time"
-        )
-
-    if auto_nonce:
+    if nonce is not None:
+        return nonce
+    elif private_key is not None:
         return web3.eth.getTransactionCount(
             Account.from_key(private_key).address, block_identifier="pending"
         )
     else:
-        return nonce
+        return web3.eth.getTransactionCount(
+            web3.eth.accounts[0], block_identifier="pending"
+        )
 
 
 def get_contract_matching_function(contract_abi, function_name, args):
