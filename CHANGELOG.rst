@@ -5,6 +5,7 @@ Change Log
 -------------------------------
 * Updated: default key derivation function (kdf) for generate_keystore changed to `pbkdf2` to be compatible with
   OpenEthereum. Use option `--kdf` to use custom kdf.
+* Updated: force the user to provide `--gas-price`, prevents the node from failing to provide a gas-price
 * Updated: remove the `--auto-nonce` option, make it a default.
   The tool will query the node for the nonce unless explicitly provided with`--nonce`
 

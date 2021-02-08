@@ -76,7 +76,7 @@ gas_price_option = click.option(
     "--gas-price",
     help="Gas price of the transaction to be sent",
     type=int,
-    default=None,
+    required=True,
     envvar="GAS_PRICE",
 )
 nonce_option = click.option(
