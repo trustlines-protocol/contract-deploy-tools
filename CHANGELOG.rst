@@ -5,6 +5,8 @@ Change Log
 -------------------------------
 * Updated: default key derivation function (kdf) for generate_keystore changed to `pbkdf2` to be compatible with
   OpenEthereum. Use option `--kdf` to use custom kdf.
+* Updated: remove the `--auto-nonce` option, make it a default.
+  The tool will query the node for the nonce unless explicitly provided with`--nonce`
 
 `0.9.1`_ (2020-01-26)
 -------------------------------
