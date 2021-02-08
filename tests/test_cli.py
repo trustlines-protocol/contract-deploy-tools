@@ -37,7 +37,8 @@ def test_contract_name():
 @pytest.fixture()
 def test_contract_address(runner, test_contract_name):
     result = runner.invoke(
-        main, f"deploy {test_contract_name} -d testcontracts --jsonrpc test 4"
+        main,
+        f"deploy {test_contract_name} -d testcontracts --jsonrpc test --gas-price 1 4",
     )
     assert result.exit_code == 0
     contract_address = result.output[:-1]
@@ -153,14 +154,16 @@ def test_unknown_contract_names_compile(runner):
 
 @pytest.mark.usefixtures("go_to_root_dir")
 def test_deploy_simple_contract(runner):
-    result = runner.invoke(main, "deploy OtherContract -d testcontracts --jsonrpc test")
+    result = runner.invoke(
+        main, "deploy OtherContract -d testcontracts --jsonrpc test --gas-price 1"
+    )
     assert result.exit_code == 0
     assert is_address(result.output[:-1])
 
 
 @pytest.mark.usefixtures("go_to_root_dir")
 def test_deploy_no_contracts_directory(runner):
-    result = runner.invoke(main, "deploy OtherContract --jsonrpc test")
+    result = runner.invoke(main, "deploy OtherContract --jsonrpc test --gas-price 1")
     assert result.exit_code == 2
     assert 'Contract directory not found: "contracts"' in result.output[:-1]
 
@@ -170,7 +173,7 @@ def test_deploy_contracts_dir_and_compiled_contracts(runner, compiled_contracts_
     result = runner.invoke(
         main,
         f"deploy OtherContract -d testcontracts --compiled-contracts"
-        f" {compiled_contracts_path} --jsonrpc test",
+        f" {compiled_contracts_path} --jsonrpc test --gas-price 1",
     )
     assert result.exit_code == 2
     assert (
@@ -185,7 +188,7 @@ def test_deploy_simple_contract_from_compiled_contracts(
 ):
     result = runner.invoke(
         main,
-        f"deploy OtherContract --compiled-contracts {compiled_contracts_path} --jsonrpc test",
+        f"deploy OtherContract --compiled-contracts {compiled_contracts_path} --jsonrpc test --gas-price 1",
     )
     assert result.exit_code == 0
     assert is_address(result.output[:-1])
@@ -195,7 +198,7 @@ def test_deploy_simple_contract_from_compiled_contracts(
 def test_deploy_contract_with_arguments(runner):
     result = runner.invoke(
         main,
-        "deploy -d testcontracts --jsonrpc test -- ManyArgumentsContract "
+        "deploy -d testcontracts --jsonrpc test --gas-price 1 -- ManyArgumentsContract "
         + "0 -1 -2 true 0x00D6Cc1BA9cf89BD2e58009741f4F7325BAdc0ED 0x00",
     )
     assert result.exit_code == 0
@@ -237,7 +240,7 @@ def test_deploy_transaction_parameters_wrong_gas_price(runner):
 def test_deploy_keystore(runner, keystore_file_path, key_password):
     result = runner.invoke(
         main,
-        f"deploy OtherContract -d testcontracts --jsonrpc test --keystore {keystore_file_path}",
+        f"deploy OtherContract -d testcontracts --jsonrpc test --gas-price 1 --keystore {keystore_file_path}",
         input=key_password,
     )
     assert result.exit_code == 0
@@ -247,7 +250,8 @@ def test_deploy_keystore(runner, keystore_file_path, key_password):
 def test_deploy_keystore_wrong_nonce(runner, keystore_file_path, key_password):
     result = runner.invoke(
         main,
-        f"deploy OtherContract -d testcontracts --jsonrpc test --nonce 100 --keystore {keystore_file_path}",
+        f"deploy OtherContract -d testcontracts --jsonrpc test --gas-price 1 "
+        f"--nonce 100 --keystore {keystore_file_path}",
         input=key_password,
     )
     assert result.exit_code == 1
@@ -255,7 +259,7 @@ def test_deploy_keystore_wrong_nonce(runner, keystore_file_path, key_password):
 
 @pytest.mark.usefixtures("go_to_root_dir")
 def test_initcode_simple_contract(runner):
-    result = runner.invoke(main, f"initcode OtherContract -d testcontracts")
+    result = runner.invoke(main, "initcode OtherContract -d testcontracts")
     print(result.output)
     assert result.exit_code == 0
 
@@ -268,7 +272,7 @@ def test_initcode_simple_contract(runner):
 @pytest.mark.usefixtures("go_to_root_dir")
 def test_initcode_with_constructor_argument(runner, key_password):
     result = runner.invoke(
-        main, f"initcode TestContract 123456 -d testcontracts", input=key_password
+        main, "initcode TestContract 123456 -d testcontracts", input=key_password
     )
     assert result.exit_code == 0
 
@@ -285,7 +289,7 @@ def test_send_transaction_to_contract(
     result = runner.invoke(
         main,
         (
-            f"transact -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"transact -d testcontracts --jsonrpc test --gas-price 1 --contract-address {test_contract_address} "
             f"-- {test_contract_name} set 1"
         ),
     )
@@ -306,7 +310,7 @@ def test_send_transaction_to_contract_from_compiled_contracts(
         main,
         (
             f"transact --compiled-contracts {compiled_contracts_path} "
-            f"--jsonrpc test --contract-address {test_contract_address} "
+            f"--jsonrpc test --gas-price 1 --contract-address {test_contract_address} "
             f"-- {test_contract_name} set 1"
         ),
     )
@@ -341,7 +345,8 @@ def test_send_transaction_with_value_parameter(
     assert result_initial_balance_call.output.strip() == "0"
 
     result_pay_transaction = runner.invoke(
-        main, f"transact --value {transaction_value} {shared_command_string} pay"
+        main,
+        f"transact --gas-price 1 --value {transaction_value} {shared_command_string} pay",
     )
     assert result_pay_transaction.exit_code == 0
 
@@ -361,7 +366,7 @@ def test_send_transaction_to_contract_with_array_address_arguments(
         main,
         (
             f"transact --compiled-contracts {compiled_contracts_path} "
-            f"--jsonrpc test --contract-address {test_contract_address} "
+            f"--jsonrpc test --gas-price 1 --contract-address {test_contract_address} "
             f"-- {test_contract_name} functionWithArrayArgument {argument}"
         ),
     )
@@ -380,7 +385,7 @@ def test_send_transaction_to_contract_find_duplicated_function_by_argument_lengt
     result = runner.invoke(
         main,
         (
-            f"transact -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"transact -d testcontracts --jsonrpc test --gas-price 1 --contract-address {test_contract_address} "
             f"-- {test_contract_name} duplicatedDifferentArgumentLength 1"
         ),
     )
@@ -400,7 +405,7 @@ def test_send_transaction_to_contract_can_not_find_duplicated_function_same_argu
     result = runner.invoke(
         main,
         (
-            f"transact -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"transact -d testcontracts --jsonrpc test --gas-price 1 --contract-address {test_contract_address} "
             f"-- {test_contract_name} duplicatedSameArgumentLength 1"
         ),
     )
@@ -416,7 +421,7 @@ def test_send_transaction_to_contract_non_existing_function(
     result = runner.invoke(
         main,
         (
-            f"transact -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"transact -d testcontracts --jsonrpc test --gas-price 1 --contract-address {test_contract_address} "
             f"-- {test_contract_name} unknown 1"
         ),
     )
@@ -430,7 +435,7 @@ def test_send_transaction_to_contract_wrong_address_format(runner, test_contract
     result = runner.invoke(
         main,
         (
-            f"transact -d testcontracts --jsonrpc test --contract-address "
+            f"transact -d testcontracts --jsonrpc test --gas-price 1 --contract-address "
             f"0x25D4760c08b4bf8e99c3658 -- {test_contract_name} set 1"
         ),
     )
@@ -445,7 +450,7 @@ def test_send_transaction_to_contract_insufficient_gas(
     result = runner.invoke(
         main,
         (
-            f"transact -d testcontracts --jsonrpc test --contract-address {test_contract_address} "
+            f"transact -d testcontracts --jsonrpc test --gas-price 1 --contract-address {test_contract_address} "
             f"--gas 1 -- {test_contract_name} set 1"
         ),
     )
@@ -580,6 +585,8 @@ def test_parse_argument_not_supported_yet(arg, type):
 
 @pytest.mark.usefixtures("go_to_root_dir")
 def test_send_eth(runner, accounts):
-    result = runner.invoke(main, (f"send-eth --jsonrpc test 123 {accounts[1]}"))
+    result = runner.invoke(
+        main, (f"send-eth --jsonrpc test --gas-price 1 123 {accounts[1]}")
+    )
 
     assert result.exit_code == 0
