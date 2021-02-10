@@ -3,6 +3,9 @@ Change Log
 ==========
 `unreleased`_
 -------------------------------
+
+`0.10.0`_ (2021-02-10)
+-------------------------------
 * Updated: default key derivation function (kdf) for generate_keystore changed to `pbkdf2` to be compatible with
   OpenEthereum. Use option `--kdf` to use custom kdf.
 * Updated: force the user to provide `--gas-price`, prevents the node from failing to provide a gas-price
@@ -146,4 +149,5 @@ Change Log
 .. _0.8.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.7.2...0.8.0
 .. _0.9.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.8.0...0.9.0
 .. _0.9.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.9.0...0.9.1
-.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.9.1...master
+.. _0.10.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.9.1...0.10.0
+.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.10.0...master
