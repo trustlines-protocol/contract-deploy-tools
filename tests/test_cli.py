@@ -534,6 +534,26 @@ def test_generate_keystore_from_private_key(
     assert result.exit_code == 0
 
 
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_verify_keystore(runner, keystore_file_path, key_password):
+    result = runner.invoke(
+        main, f"verify-keystore {keystore_file_path}", input=key_password,
+    )
+    assert result.exit_code == 0
+
+
+@pytest.mark.usefixtures("go_to_root_dir")
+def test_verify_keystore_wrong_password(runner, keystore_file_path, key_password):
+    wrong_password = "wrong_password"
+    assert (
+        wrong_password != key_password
+    ), "Cannot test wrong password as it equals the correct password"
+    result = runner.invoke(
+        main, f"verify-keystore {keystore_file_path}", input=wrong_password,
+    )
+    assert result.exit_code == 1
+
+
 @pytest.mark.parametrize(
     "arg, type, expected_return",
     [

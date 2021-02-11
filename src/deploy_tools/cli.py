@@ -485,6 +485,20 @@ def generate_keystore(
     click.echo(f"Stored keystore for {account.address} at {keystore_path}")
 
 
+@main.command(
+    short_help="Verify a keystore can be decrypted by asking for the password."
+)
+@click.argument(
+    "keystore-path", type=click.Path(exists=True, dir_okay=False), required=True
+)
+def verify_keystore(keystore_path: str):
+    private_key = retrieve_private_key(keystore_path)
+    recovered_address = Web3().eth.account.from_key(private_key=private_key).address
+    click.secho(
+        f"Correctly decrypted keystore for address: {recovered_address}", fg="green"
+    )
+
+
 @main.command(short_help="Send ether to the given address.")
 @click.argument("value", type=int)
 @click.argument("address", type=str)

@@ -3,6 +3,7 @@ Change Log
 ==========
 `unreleased`_
 -------------------------------
+* Added: command `verify-keystore` to verify a keystore by asking the password and decrypting it
 
 `0.10.0`_ (2021-02-10)
 -------------------------------
