@@ -7,3 +7,4 @@ wheel
 setuptools
 black
 pre-commit
+tox
