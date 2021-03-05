@@ -3,7 +3,7 @@ version: 2.1
 executors:
   ubuntu-builder:
     docker:
-      - image: trustlines/builder:featurerustnightly58
+      - image: trustlines/builder:master61
         environment:
           - SOLC_VERSION=v0.8.0
     working_directory: ~/repo
@@ -31,7 +31,7 @@ commands:
     - run:
         name: Configuring PATH
         command: |
-          echo >> ${BASH_ENV} 'export PATH=~/bin:~/repo/venv/bin:${PATH}'
+          echo >> ${BASH_ENV} 'export PATH=~/bin:~/repo/venv/bin:~/.cargo/bin:${PATH}'
 
 jobs:
   install:
