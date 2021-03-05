@@ -3,7 +3,9 @@ mypy
 pytest
 setuptools_scm
 pip>=18.1
+pip-tools
 wheel
 setuptools
 black
 pre-commit
+tox

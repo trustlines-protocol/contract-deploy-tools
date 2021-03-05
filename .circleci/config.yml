@@ -3,7 +3,7 @@ version: 2.1
 executors:
   ubuntu-builder:
     docker:
-      - image: trustlines/builder:master37
+      - image: trustlines/builder:master61
         environment:
           - SOLC_VERSION=v0.8.0
     working_directory: ~/repo
@@ -22,7 +22,7 @@ commands:
       - run:
           name: Create python venv
           command: |
-            python3 -m venv venv
+            python3.8 -m venv venv
             venv/bin/pip install -c dev-requirements.txt pip wheel setuptools
 
   config-path:
@@ -31,7 +31,7 @@ commands:
     - run:
         name: Configuring PATH
         command: |
-          echo >> ${BASH_ENV} 'export PATH=~/bin:~/repo/venv/bin:${PATH}'
+          echo >> ${BASH_ENV} 'export PATH=~/bin:~/repo/venv/bin:~/.cargo/bin:${PATH}'
 
 jobs:
   install:
@@ -58,6 +58,18 @@ jobs:
           root: "~"
           paths:
             - repo
+
+  install-py39:
+    executor: ubuntu-builder
+    steps:
+      - checkout
+      - config-path
+      - create-venv
+      - run:
+          name: Install with python 3.9
+          command: |
+            pip install tox
+            tox -e py39
 
   run-flake8:
     executor: ubuntu-builder
@@ -162,6 +174,10 @@ workflows:
             <<: *tagged-filter
 
       - install:
+          filters:
+            <<: *tagged-filter
+
+      - install-py39:
           filters:
             <<: *tagged-filter
 
