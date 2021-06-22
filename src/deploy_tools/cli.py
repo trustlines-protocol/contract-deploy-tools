@@ -585,11 +585,11 @@ def get_nonce(*, web3: Web3, nonce: int, private_key: bytes):
     if nonce is not None:
         return nonce
     elif private_key is not None:
-        return web3.eth.getTransactionCount(
+        return web3.eth.get_transaction_count(
             Account.from_key(private_key).address, block_identifier="pending"
         )
     else:
-        return web3.eth.getTransactionCount(
+        return web3.eth.get_transaction_count(
             web3.eth.accounts[0], block_identifier="pending"
         )
 
