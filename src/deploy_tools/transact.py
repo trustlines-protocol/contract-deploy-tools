@@ -7,6 +7,7 @@ from web3.eth import Account
 from web3.types import TxParams, TxReceipt
 from web3.exceptions import ContractLogicError
 
+
 class TransactionsFailed(Exception):
     def __init__(self, failed_tx_hashs):
         self.failed_tx_hashs = failed_tx_hashs
@@ -148,20 +149,23 @@ def wait_for_successful_transaction_receipt(
     if status == 0:
         try:
             tx = web3.eth.get_transaction(txid)
-            result = web3.eth.call({
-                "from": tx["from"],
-                "to": tx.to,
-                "gasPrice": tx.gasPrice,
-                "gas": tx.gas,
-                "value": tx.value,
-                "data": tx.input,
-                "nonce": tx.nonce
-            }, tx.blockNumber)
+            result = web3.eth.call(
+                {
+                    "from": tx["from"],
+                    "to": tx.to,
+                    "gasPrice": tx.gasPrice,
+                    "gas": tx.gas,
+                    "value": tx.value,
+                    "data": tx.input,
+                    "nonce": tx.nonce,
+                },
+                tx.blockNumber,
+            )
 
             return result
         except ContractLogicError:
             raise ContractLogicError
-        except:
+        except Exception:
             raise TransactionFailed
 
     elif status == 1:
