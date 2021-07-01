@@ -134,6 +134,17 @@ jobs:
           paths:
             - repo/dist
 
+  check-dist:
+    executor: ubuntu-builder
+    steps:
+      - attach_workspace:
+          at: '~'
+      - config-path
+      - run:
+          name: Twine check
+          command: |
+            twine check dist/*
+
   upload-pypi:
     executor: ubuntu-builder
     steps:
@@ -189,6 +200,12 @@ workflows:
       - build-dist:
           filters:
             <<: *tagged-filter
+
+      - check-dist:
+          filters:
+            <<: *tagged-filter
+          requires:
+            - build-dist
 
       - upload-pypi:
           requires:
