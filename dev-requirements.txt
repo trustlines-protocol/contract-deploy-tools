@@ -4,12 +4,17 @@
 #
 #    pip-compile --output-file=dev-requirements.txt dev-requirements.in setup.py
 #
+aiohttp==3.7.4.post0
+    # via web3
 appdirs==1.4.3
     # via
     #   black
     #   virtualenv
+async-timeout==3.0.1
+    # via aiohttp
 attrs==19.3.0
     # via
+    #   aiohttp
     #   black
     #   jsonschema
     #   pytest
@@ -28,7 +33,9 @@ certifi==2019.11.28
 cfgv==3.1.0
     # via pre-commit
 chardet==3.0.4
-    # via requests
+    # via
+    #   aiohttp
+    #   requests
 click==7.1.1
     # via
     #   black
@@ -117,8 +124,10 @@ hexbytes==0.2.0
 identify==1.4.13
     # via pre-commit
 idna==2.9
-    # via requests
-ipfshttpclient==0.4.12
+    # via
+    #   requests
+    #   yarl
+ipfshttpclient==0.7.0
     # via web3
 json-rpc==1.13.0
     # via eth-tester-rpc
@@ -134,6 +143,10 @@ more-itertools==8.2.0
     # via pytest
 multiaddr==0.0.9
     # via ipfshttpclient
+multidict==5.1.0
+    # via
+    #   aiohttp
+    #   yarl
 mypy-extensions==0.4.3
     # via
     #   mypy
@@ -214,7 +227,6 @@ setuptools-scm==3.5.0
     # via -r dev-requirements.in
 six==1.14.0
     # via
-    #   ipfshttpclient
     #   jsonschema
     #   multiaddr
     #   packaging
@@ -242,6 +254,7 @@ typed-ast==1.4.1
     #   mypy
 typing-extensions==3.7.4.1
     # via
+    #   aiohttp
     #   mypy
     #   trie
 urllib3==1.25.8
@@ -254,7 +267,7 @@ virtualenv==20.0.13
     #   tox
 wcwidth==0.1.9
     # via pytest
-web3==5.9.0
+web3==5.20.0
     # via contract-deploy-tools (setup.py)
 websockets==8.1
     # via web3
@@ -262,6 +275,8 @@ werkzeug==1.0.1
     # via eth-tester-rpc
 wheel==0.34.2
     # via -r dev-requirements.in
+yarl==1.6.3
+    # via aiohttp
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

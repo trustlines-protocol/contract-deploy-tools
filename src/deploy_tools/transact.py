@@ -5,6 +5,7 @@ from web3 import Web3
 from web3._utils.transactions import fill_transaction_defaults
 from web3.eth import Account
 from web3.types import TxParams, TxReceipt
+from web3.exceptions import ContractLogicError
 
 
 class TransactionsFailed(Exception):
@@ -40,7 +41,7 @@ def send_transaction(*, web3: Web3, transaction_options: TxParams, private_key=N
         transaction = fill_nonce(web3, transaction_options)
         transaction = fill_transaction_defaults(web3, transaction)
         signed_transaction = account.sign_transaction(transaction)
-        tx_hash = web3.eth.sendRawTransaction(signed_transaction.rawTransaction)
+        tx_hash = web3.eth.send_raw_transaction(signed_transaction.rawTransaction)
 
     else:
         _set_from_address(web3, transaction_options)
@@ -86,7 +87,7 @@ def send_function_call_transaction(
             transaction_options=transaction_options,
             private_key=private_key,
         )
-        tx_hash = web3.eth.sendRawTransaction(signed_transaction.rawTransaction)
+        tx_hash = web3.eth.send_raw_transaction(signed_transaction.rawTransaction)
 
     else:
         _set_from_address(web3, transaction_options)
@@ -122,7 +123,7 @@ def wait_for_successful_transaction_receipts(
     failed_tx_hashs = set()
 
     for tx_hash in tx_hashs:
-        receipt = web3.eth.waitForTransactionReceipt(tx_hash, timeout=timeout)
+        receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=timeout)
         status = receipt.get("status", None)
         if status == 0:
             failed_tx_hashs.add(tx_hash)
@@ -143,10 +144,30 @@ def wait_for_successful_transaction_receipt(
     """See if transaction went through (Solidity code did not throw).
     :return: Transaction receipt
     """
-    receipt = web3.eth.waitForTransactionReceipt(txid, timeout=timeout)
+    receipt = web3.eth.wait_for_transaction_receipt(txid, timeout=timeout)
     status = receipt.get("status", None)
     if status == 0:
-        raise TransactionFailed
+        try:
+            tx = web3.eth.get_transaction(txid)
+            result = web3.eth.call(
+                {
+                    "from": tx["from"],
+                    "to": tx.to,
+                    "gasPrice": tx.gasPrice,
+                    "gas": tx.gas,
+                    "value": tx.value,
+                    "data": tx.input,
+                    "nonce": tx.nonce,
+                },
+                tx.blockNumber,
+            )
+
+            return result
+        except ContractLogicError:
+            raise ContractLogicError
+        except Exception:
+            raise TransactionFailed
+
     elif status == 1:
         return receipt
     else:
@@ -189,7 +210,7 @@ def build_transaction_options(*, gas, gas_price, nonce, value=None):
 
 def fill_nonce(web3, transaction_options):
     if "from" in transaction_options and "nonce" not in transaction_options:
-        transaction_options["nonce"] = web3.eth.getTransactionCount(
+        transaction_options["nonce"] = web3.eth.get_transaction_count(
             transaction_options["from"], block_identifier="pending"
         )
     return transaction_options
