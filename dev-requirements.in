@@ -9,3 +9,4 @@ setuptools
 black
 pre-commit
 tox
+eth-tester[py-evm]<0.7.0b0

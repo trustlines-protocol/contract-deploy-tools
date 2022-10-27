@@ -580,8 +580,7 @@ def retrieve_private_key(keystore_path):
 
 
 def get_nonce(*, web3: Web3, nonce: int, private_key: bytes):
-    """get the nonce to be used as specified via command line options
-    """
+    """get the nonce to be used as specified via command line options"""
     if nonce is not None:
         return nonce
     elif private_key is not None:
