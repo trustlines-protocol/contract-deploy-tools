@@ -96,7 +96,7 @@ def contract_assets(pytestconfig):
 def deploy_contract(web3, contract_assets):
     """Fixture to deploy a contract on the current chain
 
-       Usage: `deploy_contract('contract_identifier', constructor_args=(1,2,3))`
+    Usage: `deploy_contract('contract_identifier', constructor_args=(1,2,3))`
     """
 
     def deploy_contract_function(

@@ -39,7 +39,7 @@ def test_send_contract_call_with_transaction_options(test_contract, web3, accoun
 
     function_call = test_contract.functions.set(200)
 
-    transaction_options = {"gas": 199999, "gasPrice": 99}
+    transaction_options = {"gas": 199999, "gasPrice": 123456789876}
 
     receipt = wait_for_successful_function_call(
         function_call,
@@ -92,15 +92,17 @@ def test_send_eth_default_account(web3, accounts, account_keys, use_private_key)
     pre_balance_0 = web3.eth.getBalance(accounts[0])
     pre_balance_1 = web3.eth.getBalance(accounts[1])
     value = 123
-    transaction_option = {"value": value, "to": accounts[1], "gasPrice": 0}
+    gas_price = 123456789876
+    transaction_option = {"value": value, "to": accounts[1], "gasPrice": gas_price}
     wait_for_successful_transaction(
         web3=web3,
         transaction_options=transaction_option,
         private_key=account_keys[0] if use_private_key else None,
     )
+    tx_fees = gas_price * 21_000
 
     post_balance_0 = web3.eth.getBalance(accounts[0])
     post_balance_1 = web3.eth.getBalance(accounts[1])
 
-    assert post_balance_0 - pre_balance_0 == -value
+    assert post_balance_0 - pre_balance_0 == -value - tx_fees
     assert post_balance_1 - pre_balance_1 == value

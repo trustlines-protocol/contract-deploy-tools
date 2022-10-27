@@ -183,6 +183,7 @@ def build_transaction_options(*, gas, gas_price, nonce, value=None):
         transaction_options["nonce"] = nonce
     if value is not None:
         transaction_options["value"] = value
+    transaction_options["type"] = 1
 
     return transaction_options
 
