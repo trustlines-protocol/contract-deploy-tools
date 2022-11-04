@@ -4,6 +4,11 @@ Change Log
 `unreleased`_
 -------------------------------
 
+`0.11.0`_ (2022-11-04)
+-------------------------------
+* Updated: web3 dependency in order to support EIP-1559
+* Removed: Eth-tester-rpc dependency & exposed test node RPC
+
 `0.10.0`_ (2021-02-10)
 -------------------------------
 * Updated: default key derivation function (kdf) for generate_keystore changed to `pbkdf2` to be compatible with
@@ -150,4 +155,5 @@ Change Log
 .. _0.9.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.8.0...0.9.0
 .. _0.9.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.9.0...0.9.1
 .. _0.10.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.9.1...0.10.0
-.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.10.0...master
+.. _0.11.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.10.0...0.11.0
+.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.11.0...master
