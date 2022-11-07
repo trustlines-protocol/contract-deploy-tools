@@ -48,7 +48,7 @@ def test_send_contract_call_with_transaction_options(test_contract, web3, accoun
         private_key=account_keys[2],
     )
 
-    transaction = web3.eth.getTransaction(receipt.transactionHash)
+    transaction = web3.eth.get_transaction(receipt.transactionHash)
 
     for key, value in transaction_options.items():
         assert transaction[key] == value
@@ -89,8 +89,8 @@ def test_wait_for_successful_tx_receipt(test_contract, web3, account_keys):
 
 @pytest.mark.parametrize("use_private_key", [True, False])
 def test_send_eth_default_account(web3, accounts, account_keys, use_private_key):
-    pre_balance_0 = web3.eth.getBalance(accounts[0])
-    pre_balance_1 = web3.eth.getBalance(accounts[1])
+    pre_balance_0 = web3.eth.get_balance(accounts[0])
+    pre_balance_1 = web3.eth.get_balance(accounts[1])
     value = 123
     gas_price = 123456789876
     transaction_option = {"value": value, "to": accounts[1], "gasPrice": gas_price}
@@ -101,8 +101,8 @@ def test_send_eth_default_account(web3, accounts, account_keys, use_private_key)
     )
     tx_fees = gas_price * 21_000
 
-    post_balance_0 = web3.eth.getBalance(accounts[0])
-    post_balance_1 = web3.eth.getBalance(accounts[1])
+    post_balance_0 = web3.eth.get_balance(accounts[0])
+    post_balance_1 = web3.eth.get_balance(accounts[1])
 
     assert post_balance_0 - pre_balance_0 == -value - tx_fees
     assert post_balance_1 - pre_balance_1 == value

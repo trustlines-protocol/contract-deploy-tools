@@ -3,7 +3,7 @@ import os
 from typing import Any, Dict, List
 
 from eth_utils import add_0x_prefix
-from solc import compile_standard
+from solcx import compile_standard
 from web3 import Web3
 from web3._utils.abi import get_constructor_abi
 from web3._utils.contracts import encode_abi

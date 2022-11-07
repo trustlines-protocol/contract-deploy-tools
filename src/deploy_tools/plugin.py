@@ -144,13 +144,13 @@ def web3(chain):
 @pytest.fixture(scope="session", autouse=True)
 def set_default_account(web3):
     """Sets the web3 default account to the first account of `accounts`"""
-    web3.eth.defaultAccount = web3.eth.accounts[0]
+    web3.eth.default_account = web3.eth.accounts[0]
 
 
 @pytest.fixture(scope="session")
 def default_account(web3):
     """Returns the default account which is used to deploy contracts"""
-    return web3.eth.defaultAccount
+    return web3.eth.default_account
 
 
 @pytest.fixture(scope="session")

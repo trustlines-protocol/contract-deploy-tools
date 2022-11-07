@@ -40,11 +40,11 @@ def send_transaction(*, web3: Web3, transaction_options: TxParams, private_key=N
         transaction = fill_nonce(web3, transaction_options)
         transaction = fill_transaction_defaults(web3, transaction)
         signed_transaction = account.sign_transaction(transaction)
-        tx_hash = web3.eth.sendRawTransaction(signed_transaction.rawTransaction)
+        tx_hash = web3.eth.send_raw_transaction(signed_transaction.rawTransaction)
 
     else:
         _set_from_address(web3, transaction_options)
-        tx_hash = web3.eth.sendTransaction(transaction_options)
+        tx_hash = web3.eth.send_transaction(transaction_options)
 
     return tx_hash
 
@@ -86,7 +86,7 @@ def send_function_call_transaction(
             transaction_options=transaction_options,
             private_key=private_key,
         )
-        tx_hash = web3.eth.sendRawTransaction(signed_transaction.rawTransaction)
+        tx_hash = web3.eth.send_raw_transaction(signed_transaction.rawTransaction)
 
     else:
         _set_from_address(web3, transaction_options)
@@ -143,7 +143,7 @@ def wait_for_successful_transaction_receipt(
     """See if transaction went through (Solidity code did not throw).
     :return: Transaction receipt
     """
-    receipt = web3.eth.waitForTransactionReceipt(txid, timeout=timeout)
+    receipt = web3.eth.wait_for_transaction_receipt(txid, timeout=timeout)
     status = receipt.get("status", None)
     if status == 0:
         raise TransactionFailed
@@ -166,7 +166,7 @@ def _build_and_sign_transaction(
         )
     transaction_options["from"] = account.address
 
-    transaction = fill_nonce(web3, function_call.buildTransaction(transaction_options))
+    transaction = fill_nonce(web3, function_call.build_transaction(transaction_options))
 
     return account.sign_transaction(transaction)
 
@@ -190,7 +190,7 @@ def build_transaction_options(*, gas, gas_price, nonce, value=None):
 
 def fill_nonce(web3, transaction_options):
     if "from" in transaction_options and "nonce" not in transaction_options:
-        transaction_options["nonce"] = web3.eth.getTransactionCount(
+        transaction_options["nonce"] = web3.eth.get_transaction_count(
             transaction_options["from"], block_identifier="pending"
         )
     return transaction_options
@@ -203,7 +203,7 @@ def _set_from_address(web3, transaction_options):
     we need to do that ourselves
     """
     if "from" not in transaction_options:
-        transaction_options["from"] = web3.eth.defaultAccount or web3.eth.accounts[0]
+        transaction_options["from"] = web3.eth.default_account or web3.eth.accounts[0]
 
 
 def increase_transaction_options_nonce(transaction_options: Dict) -> None:
