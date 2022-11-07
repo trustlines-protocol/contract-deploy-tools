@@ -4,6 +4,10 @@ Change Log
 `unreleased`_
 -------------------------------
 
+`0.11.1`_ (2022-11-07)
+-------------------------------
+* Updated: fix deprecation warnings
+
 `0.11.0`_ (2022-11-04)
 -------------------------------
 * Updated: web3 dependency in order to support EIP-1559
@@ -156,4 +160,5 @@ Change Log
 .. _0.9.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.9.0...0.9.1
 .. _0.10.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.9.1...0.10.0
 .. _0.11.0: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.10.0...0.11.0
-.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.11.0...master
+.. _0.11.1: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.11.0...0.11.1
+.. _unreleased: https://github.com/trustlines-protocol/contract-deploy-tools/compare/0.11.1...master
